@@ -1,0 +1,22 @@
+= Image Metadata processing using Java
+
+Examples for processing image metadata using Java
+
+== Requirements
+
+- Java 17
+- For native compilation: 22.3.r19-grl
+
+== Build
+
+```bash
+./mvn clean package
+```
+
+=== Native Image (local OS)
+
+```bash
+./mvnw clean package -Pnative
+```
+
+

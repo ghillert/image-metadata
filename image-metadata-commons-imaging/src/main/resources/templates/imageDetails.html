@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="Gunnar Hillert">
+    <meta name="generator" content="Spring Boot 3">
+    <title>Image Metadata Demo</title>
+
+    <link rel="canonical" href="https://getbootstrap.com/docs/5.2/examples/starter-template/">
+    <link href="/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+
+    <!-- Favicons -->
+    <link rel="apple-touch-icon" href="/docs/5.2/assets/img/favicons/apple-touch-icon.png" sizes="180x180">
+    <link rel="icon" href="/docs/5.2/assets/img/favicons/favicon-32x32.png" sizes="32x32" type="image/png">
+    <link rel="icon" href="/docs/5.2/assets/img/favicons/favicon-16x16.png" sizes="16x16" type="image/png">
+    <link rel="manifest" href="/docs/5.2/assets/img/favicons/manifest.json">
+    <link rel="mask-icon" href="/docs/5.2/assets/img/favicons/safari-pinned-tab.svg" color="#712cf9">
+    <link rel="icon" href="/docs/5.2/assets/img/favicons/favicon.ico">
+    <meta name="theme-color" content="#712cf9">
+
+
+    <style>
+        .bd-placeholder-img {
+            font-size: 1.125rem;
+            text-anchor: middle;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            user-select: none;
+        }
+
+        @media (min-width: 768px) {
+            .bd-placeholder-img-lg {
+                font-size: 3.5rem;
+            }
+        }
+
+        .b-example-divider {
+            height: 3rem;
+            background-color: rgba(0, 0, 0, .1);
+            border: solid rgba(0, 0, 0, .15);
+            border-width: 1px 0;
+            box-shadow: inset 0 .5em 1.5em rgba(0, 0, 0, .1), inset 0 .125em .5em rgba(0, 0, 0, .15);
+        }
+
+        .b-example-vr {
+            flex-shrink: 0;
+            width: 1.5rem;
+            height: 100vh;
+        }
+
+        .bi {
+            vertical-align: -.125em;
+            fill: currentColor;
+        }
+
+        .nav-scroller {
+            position: relative;
+            z-index: 2;
+            height: 2.75rem;
+            overflow-y: hidden;
+        }
+
+        .nav-scroller .nav {
+            display: flex;
+            flex-wrap: nowrap;
+            padding-bottom: 1rem;
+            margin-top: -1px;
+            overflow-x: auto;
+            text-align: center;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+        }
+    </style>
+</head>
+<body>
+
+<div class="col-lg-8 mx-auto p-4 py-md-5">
+    <header class="d-flex align-items-center pb-3 mb-5 border-bottom">
+        <a href="/" class="d-flex align-items-center text-dark text-decoration-none">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="me-2 bi bi-image" viewBox="0 0 16 16">
+                <path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
+                <path d="M2.002 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2h-12zm12 1a1 1 0 0 1 1 1v6.5l-3.777-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12V3a1 1 0 0 1 1-1h12z"/>
+            </svg>
+            <span class="fs-4">Image Metadata Demo</span>
+        </a>
+    </header>
+
+    <main>
+        <h1>GNSS (GPS) Data</h1>
+        <div class="alert alert-primary d-flex align-items-center" role="alert" th:unless="${mapLocation}">
+            <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Info:"><use xlink:href="#info-fill"/></svg>
+            <div>
+                No GNSS data available.
+            </div>
+        </div>
+        <div class="row align-items-start" th:if="${mapLocation}">
+            <div class="col">
+                <table class="table" >
+                    <thead>
+                    <tr>
+                        <th scope="col" class="col-4">Key</th>
+                        <th scope="col" class="col-8">Value</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <th scope="row">Latitude</th>
+                        <td th:text="${mapLocation.latitude}">value</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Longitude</th>
+                        <td th:text="${mapLocation.longitude}">value</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Altitude</th>
+                        <td th:text="${mapLocation.elevation} + 'm'">value</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="col">
+                <div id="map" style="width:400px;height:400px;background:grey">Map</div>
+            </div>
+        </div>
+        <hr>
+
+        <h1>Details</h1>
+
+        <p th:text="${message}" th:if="${message ne null}" class="alert alert-primary"></p>
+        <p th:text="${error}" th:if="${error ne null}" class="alert alert-danger"></p>
+
+        <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+            <symbol id="info-fill" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
+            </symbol>
+        </svg>
+
+        <div th:if="${message}">
+            <h2 th:text="${message}"/>
+        </div>
+
+<!--        <picture>-->
+<!--            <source media="(min-width:650px)" srcset="img_pink_flowers.jpg">-->
+<!--            <source media="(min-width:465px)" srcset="img_white_flower.jpg">-->
+<!--            <img src="img_orange_flowers.jpg" alt="Flowers" style="width:auto;">-->
+<!--        </picture>-->
+
+        <img class="img-thumbnail" th:src="@{'/images/' + ${filename} + '?width=500'}" th:alt="${filename}"/>
+
+        <div>
+            <ul>
+                <li th:each="file : ${files}">
+                    <a th:href="${file}" th:text="${file}" />
+                </li>
+            </ul>
+        </div>
+
+        <img th:each="file : ${files}" th:src="${file}"/>
+
+        <h3>Metadata with [(${metadataCount})] elements</h3>
+
+        <div th:each="m : ${metadata}">
+            <h4><span th:text="${m.key.name}"></span> (<span th:text="${m.key.description}"></span>)</h4>
+            <hr/>
+            <table class="table" >
+                <thead>
+                <tr>
+                    <th scope="col" class="col-4">Key</th>
+                    <th scope="col" class="col-8">Value</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="m : ${m.value}">
+                    <th th:text="${m.propertyName}" scope="row">key</th>
+                    <td th:text="${m.propertyValue}">value</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <pre th:if="${xmpData}"><code class="language-xml"th:text="${xmpData}">XMP XML Data Here.</code></pre>
+
+    </main>
+    <footer class="pt-5 my-5 text-muted border-top">
+        Created by Gunnar Hillert &middot; &copy; 2022
+    </footer>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+<script src="/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
+<script th:if="${mapLocation}"
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&callback=initMap&v=weekly"
+        defer
+></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+
+<script th:inline="javascript" th:if="${mapLocation}">
+    function initMap() {
+        // The location of Uluru //  /*[[${message}]]*/ 'defaultanyvalue'
+        const imageLocation = { lat: [(${mapLocation.latitude})], lng: [(${mapLocation.longitude})] };
+        // The map, centered at Uluru
+        const map = new google.maps.Map(document.getElementById("map"), {
+            zoom: 10,
+            center: imageLocation,
+        });
+
+        // The marker, positioned at Uluru
+        const marker = new google.maps.Marker({
+            position: imageLocation,
+            map: map,
+        });
+    }
+
+    window.initMap = initMap;
+</script>
+<script th:inline="javascript" th:if="${xmpData}">
+    $(function() {
+        console.log( "ready!" );
+        hljs.highlightAll();
+    });
+</script>
+
+</body>
+</html>

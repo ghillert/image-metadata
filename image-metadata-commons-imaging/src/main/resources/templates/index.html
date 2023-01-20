@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="Gunnar Hillert">
+    <meta name="generator" content="Spring Boot 3">
+    <title>Image Metadata Demo</title>
+
+    <link rel="canonical" href="https://getbootstrap.com/docs/5.2/examples/starter-template/">
+    <link href="/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+
+    <!-- Favicons -->
+    <link rel="apple-touch-icon" href="/docs/5.2/assets/img/favicons/apple-touch-icon.png" sizes="180x180">
+    <link rel="icon" href="/docs/5.2/assets/img/favicons/favicon-32x32.png" sizes="32x32" type="image/png">
+    <link rel="icon" href="/docs/5.2/assets/img/favicons/favicon-16x16.png" sizes="16x16" type="image/png">
+    <link rel="manifest" href="/docs/5.2/assets/img/favicons/manifest.json">
+    <link rel="mask-icon" href="/docs/5.2/assets/img/favicons/safari-pinned-tab.svg" color="#712cf9">
+    <link rel="icon" href="/docs/5.2/assets/img/favicons/favicon.ico">
+    <meta name="theme-color" content="#712cf9">
+
+
+    <style>
+        .bd-placeholder-img {
+            font-size: 1.125rem;
+            text-anchor: middle;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            user-select: none;
+        }
+
+        @media (min-width: 768px) {
+            .bd-placeholder-img-lg {
+                font-size: 3.5rem;
+            }
+        }
+
+        .b-example-divider {
+            height: 3rem;
+            background-color: rgba(0, 0, 0, .1);
+            border: solid rgba(0, 0, 0, .15);
+            border-width: 1px 0;
+            box-shadow: inset 0 .5em 1.5em rgba(0, 0, 0, .1), inset 0 .125em .5em rgba(0, 0, 0, .15);
+        }
+
+        .b-example-vr {
+            flex-shrink: 0;
+            width: 1.5rem;
+            height: 100vh;
+        }
+
+        .bi {
+            vertical-align: -.125em;
+            fill: currentColor;
+        }
+
+        .nav-scroller {
+            position: relative;
+            z-index: 2;
+            height: 2.75rem;
+            overflow-y: hidden;
+        }
+
+        .nav-scroller .nav {
+            display: flex;
+            flex-wrap: nowrap;
+            padding-bottom: 1rem;
+            margin-top: -1px;
+            overflow-x: auto;
+            text-align: center;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+        }
+    </style>
+</head>
+<body>
+
+<div class="col-lg-8 mx-auto p-4 py-md-5">
+    <header class="d-flex align-items-center pb-3 mb-5 border-bottom">
+        <a href="/" class="d-flex align-items-center text-dark text-decoration-none">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="me-2 bi bi-image" viewBox="0 0 16 16">
+                <path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
+                <path d="M2.002 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2h-12zm12 1a1 1 0 0 1 1 1v6.5l-3.777-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12V3a1 1 0 0 1 1-1h12z"/>
+            </svg>
+            <span class="fs-4">Image Metadata Demo</span>
+        </a>
+    </header>
+
+    <main>
+        <p th:text="${message}" th:if="${message ne null}" class="alert alert-primary"></p>
+        <p th:text="${error}" th:if="${error ne null}" class="alert alert-danger"></p>
+        <ul>
+            <li th:each="err : ${#fields.errors('imageUploadForm.*')}" th:text="${err}" />
+        </ul>
+<!--        <div th:if="${#fields.hasAnyErrors()}">-->
+<!--            <ul>-->
+<!--                <li th:each="err : ${#fields.allErrors()}" th:text="${err}" />-->
+<!--            </ul>-->
+<!--        </div>-->
+
+        <h1>Let's get started by uploading an image!</h1>
+        <p class="fs-5 col-md-8">The image you upload will be resized and the metadata will be extracted.</p>
+
+        <form name="imageUploadForm" id="imageForm" method="POST" enctype="multipart/form-data"
+              th:action="@{'/'}" th:object="${imageUploadForm}">
+            <div class="mb-2">
+                <label for="imageFile" class="form-label">Upload Image</label>
+                <input class="form-control" type="file" id="imageFile" name="imageFile">
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="" id="removeMetadata" name="removeMetadata" th:field="*{removeMetadata}">
+                <label class="form-check-label" for="removeMetadata">
+                    Remove Metadata
+                </label>
+            </div>
+            <div class="alert alert-primary d-flex align-items-center" role="alert">
+                <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Info:"><use xlink:href="#info-fill"/></svg>
+                <div>
+                    Keep in mind that the images you upload are not larger than <span th:text="${uploadSizeLimit}">uploadSizeLimit2</span> MB.
+                </div>
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary mb-3">Upload photo</button>
+            </div>
+        </form>
+
+        <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+            <symbol id="info-fill" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
+            </symbol>
+        </svg>
+
+        <hr class="col-12">
+
+        <div th:if="${message}">
+            <h2 th:text="${message}"/>
+        </div>
+
+        <div class="row image-grid" th:if="${files != null and !files.empty}">
+            <div class="col-sm-6 col-lg-4 mb-4 image-grid-item" th:each="file : ${files}">
+                <div class="card">
+                    <img class="card-img-top" th:src="@{'/images/' + ${file}}" th:alt="${file}"/>
+                    <div class="card-body">
+                        <p class="card-text" th:text="${file}">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                        <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+                            <a th:href="@{'/image-details/' + ${file}}" class="btn btn-primary">Details</a>
+                            <a th:href="@{'/delete-image/' + ${file}}" class="btn btn-danger">Delete</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr class="col-12" th:if="${files != null and !files.empty}">
+        <div class="row g-5">
+            <div class="col-md-6">
+                <h2>Resources</h2>
+                <p>Some additional resources for retrieving image metadata.</p>
+                <ul>
+                    <li class="d-flex align-items-start mb-1"><a href="https://medium.com/@hillert/read-write-image-metadata-with-java-part-1-d5e2057c80d9" rel="noopener" target="_blank">Read & Write Image Metadata with Java — Part 1</a></li>
+                    <li class="text-muted d-flex align-items-start mb-1">Read & Write Image Metadata with Java — Part 2 (coming soon!)</li>
+                </ul>
+            </div>
+
+            <div class="col-md-6">
+                <h2>Used Frameworks/Libraries</h2>
+                <ul class="icon-list ps-0">
+                    <li class="d-flex align-items-start mb-1"><a href="https://spring.io/projects/spring-boot">Spring Boot 3</a><span class="px-2">|</span>Web Framework</li>
+                    <li class="d-flex align-items-start mb-1"><a href="https://www.thymeleaf.org/">Thymeleaf</a><span class="px-2">|</span>Server-side Java template engine</li>
+                    <li class="d-flex align-items-start mb-1"><a href="https://commons.apache.org/proper/commons-imaging/">Apache Commons Imaging</a><span class="px-2">|</span>Read + Write Metadata</li>
+                    <li class="d-flex align-items-start mb-1"><a href="https://xmlgraphics.apache.org/commons/">Apache XML Graphics Commons</a><span class="px-2">|</span>Change XMP XML</li>
+                    <li class="d-flex align-items-start mb-1"><a href="https://imagej.net/software/imagej/">ImageJ</a><span class="px-2">|</span>Resizing + Adding Labels</li>
+                    <li class="d-flex align-items-start mb-1"><a href="https://xerces.apache.org/xerces2-j/">Xerces</a><span class="px-2">|</span>Reformatting of raw XMP XML
+    </main>
+    <footer class="pt-5 my-5 text-muted border-top">
+        Created by Gunnar Hillert &middot; &copy; 2022
+    </footer>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+<script src="/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js" integrity="sha384-GNFwBvfVxBkLMJpYMOABq3c+d3KnQxudP/mGPkzpZSTYykLBNsZEnG2D9G/X/+7D" crossorigin="anonymous" async></script>
+<script src="https://unpkg.com/imagesloaded@5/imagesloaded.pkgd.min.js"></script>
+
+<script>
+    $(function() {
+        console.log( "ready!" );
+    });
+
+    $(function(){
+
+        var $container = $('.image-grid');
+
+        $container.imagesLoaded(function (){
+            console.log(">>>>>", $container);
+            $container.masonry({
+                itemSelector: '.image-grid-item',
+                percentPosition: true
+            })
+        });
+
+    });
+</script>
+
+</body>
+</html>
