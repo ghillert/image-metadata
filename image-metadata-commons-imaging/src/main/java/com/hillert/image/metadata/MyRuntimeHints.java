@@ -25,6 +25,17 @@ public class MyRuntimeHints implements RuntimeHintsRegistrar {
 		hints.reflection().registerType(DTDDVFactoryImpl.class, MemberCategory.INVOKE_PUBLIC_CONSTRUCTORS);
 		hints.reflection().registerType(XIncludeAwareParserConfiguration.class, MemberCategory.INVOKE_PUBLIC_CONSTRUCTORS);
 
+		Method getDefaultToolkitMethod = ReflectionUtils.findMethod(java.awt.Toolkit.class, "getDefaultToolkit");
+		hints.reflection().registerMethod(method, ExecutableMode.INVOKE);
+
+		hints.resources().registerPattern("fonts/*");
+		hints.resources().registerPattern("static/*");
+
+		hints.jni().getTypeHint(java.util.HashMap.class);
+		hints.jni().registerType(java.util.HashMap.class , MemberCategory.DECLARED_CLASSES, MemberCategory.INVOKE_PUBLIC_METHODS);
+		hints.jni().registerType(java.util.ArrayList.class , MemberCategory.DECLARED_CLASSES, MemberCategory.INVOKE_PUBLIC_METHODS, MemberCategory.INVOKE_DECLARED_CONSTRUCTORS);
+		hints.jni().registerType(java.lang.String.class , MemberCategory.DECLARED_CLASSES, MemberCategory.INVOKE_PUBLIC_METHODS);
+
 	}
 }
 

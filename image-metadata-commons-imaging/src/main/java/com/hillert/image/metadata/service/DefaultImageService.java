@@ -21,10 +21,7 @@ import java.awt.FontFormatException;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -216,6 +213,7 @@ public class DefaultImageService implements ImageService {
 		if (imageLoaderType == null) {
 			imageLoaderType = ImageLoaderType.AWT_TOOLKIT;
 		}
+		System.setProperty("java.awt.headless", "true");
 		Graphics2D g2 = (Graphics2D) bufferedImage.getGraphics();
 		RenderingHints rh = new RenderingHints(
 				RenderingHints.KEY_TEXT_ANTIALIASING,
@@ -236,21 +234,31 @@ public class DefaultImageService implements ImageService {
 
 		LOGGER.info("Current Width: {} - Target Width: {}.", currentWidth, targetWidth);
 
-		Resource fontResource = new ClassPathResource("fonts/Montserrat-SemiBold.ttf");
+		Resource fontResource = new ClassPathResource("/fonts/Montserrat-VariableFont_wght.ttf");
 		InputStream stream = null;
 
 		try {
-			stream = fontResource.getInputStream();
+			stream = new BufferedInputStream(fontResource.getInputStream());
 		}
 		catch (IOException ex) {
 			ex.printStackTrace();
 		}
+//		File fontAsFile = new File("home/fonts/Montserrat-SemiBold.ttf");
+//		System.out.println("?????? " + fontAsFile.getAbsolutePath());
+
 		Font font;
 
 		try {
-			font = Font.createFont(Font.TRUETYPE_FONT, stream).deriveFont(20f);
-		}
-		catch (FontFormatException | IOException ex) {
+			//System.out.println(fontResource.getFilename() + " Font length: .....>>>>>" + stream.readAllBytes().length);
+			Files.createTempFile("+~JF", ".tmp").toFile();
+			Font montserratSemiBold = Font.createFont(Font.TRUETYPE_FONT, stream);
+			//Font montserratSemiBold = Font.createFont(Font.TRUETYPE_FONT, fontAsFile);
+			font = montserratSemiBold.deriveFont(20f);
+		} catch (FontFormatException ex) {
+			ex.printStackTrace();
+			throw new IllegalStateException(ex);
+		} catch (IOException ex) {
+			ex.printStackTrace();
 			throw new IllegalStateException(ex);
 		}
 
@@ -266,7 +274,7 @@ public class DefaultImageService implements ImageService {
 
 		scaledImageProcessor.setAntialiasedText(true);
 		scaledImageProcessor.setColor(Color.GREEN);
-		scaledImageProcessor.setFont(font);
+//		scaledImageProcessor.setFont(font);
 		scaledImageProcessor.drawString(label, 20, 40);
 
 		image = new ImagePlus("Plant", scaledImageProcessor);
