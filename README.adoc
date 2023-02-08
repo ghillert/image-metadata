@@ -1,38 +1,118 @@
+:current-version: 1.0.0-SNAPSHOT
+
 = Image Metadata processing using Java
 
-Examples for processing image metadata using Java
+This repository contains examples for processing image metadata using Java. Currently, the following module
+is available:
 
-== Requirements
+*image-metadata-commons-imaging*
 
-- Java 17
-- For native compilation: 22.3.r19-grl
+This https://spring.io/projects/spring-boot[Spring Boot] 3 application will allow you to upload images (JPG, PNG, GIF) and the application will extract the
+metadata from the files. This includes:
 
-== Build
+- *EXIF* (Exchangeable image file format)
+- *IPTC* (International Press Telecommunications Council)
+- *XMP* (eXtensible Metadata Platform)
+- Generic *file* metadata
+
+== Building from Source
+
+=== Requirements
+
+- https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html[Java 17]
+- https://help.github.com/set-up-git-redirect[Git]
+- For native compilation: https://www.graalvm.org/downloads/[GraalVM 22.3.1]
+
+=== Check out source code
+
+Check out the project using https://git-scm.com/[Git]:
+
+[source,bash,indent=0]
+----
+git clone https://github.com/ghillert/image-metadata.git
+cd image-metadata
+----
+
+=== Build
 
 ```bash
-./mvn clean package
+./mvnw clean package
 ```
 
-=== Native Image (local OS)
+=== Run
+
+```bash
+java -jar ./image-metadata-commons-imaging/image-metadata-commons-imaging-{current-version}.jar
+```
+
+=== Run + Run in one go
+
+```bash
+./mvnw spring:run
+```
+
+== Going Native
+
+=== Local Native Image
+
+Creating a local image should be as easy as:
+
+```bash
+./mvnw clean package -DnativeCompile
+```
+
+This shorthand system property will activate the Maven profiles:
+
+- native
+- nativeCompile
+
+```bash
+./mvnw clean package -Pnative,nativeCompile
+```
+
+==== macOS
+
+As the application uses some AWT classes for image processing, the native
+version for macOS will not run. There is an
+https://github.com/oracle/graal/issues/4124[open GitHub issue] at the GraalVM
+project.
+
+==== Windows
+
+On Windows it is critical to compile the project using the
+*x64 Native Tools Command Prompt for VS 2022*. See the following blog posts
+for more information:
+
+- https://medium.com/graalvm/using-graalvm-and-native-image-on-windows-10-9954dc071311
+- https://www.jianshu.com/p/a53ae350f845?v=1669292961020
+
+==== Linux
+
+Not tested, yet, but should just work :-) See the instructions for Docker below.
+
+=== Docker
+
+_image-metadata-commons-imaging_ uses fonts, which on Linux require `fontconfig`
+to be installed. That's why I use `paketobuildpacks/builder:full` and not the
+default `paketobuildpacks/builder:tiny`.
+
+```bash
+./mvnw -Pnative spring-boot:build-image
+docker run --rm -p 8080:8080 docker.io/library/image-metadata-commons-imaging:{current-version}
+```
 
 ```bash
 ./mvnw clean package -Pnative
 ```
 
-Windows
+== Development
 
-x64 Native Tools Command Prompt for VS 2022
-/c/Users/hille/.sdkman/candidates/java/current/bin/java
+When adding functionality, it may be necessary to run the *native-image-agent*:
 
+```bash
+java -Dspring.aot.enabled=true -agentlib:native-image-agent=config-output-dir=./out/ -jar target/image-metadata-commons-imaging-{current-version}.jar
+```
 
-Resources
+== License
 
-https://www.jianshu.com/p/a53ae350f845?v=1669292961020
-
-
-Run Agent
-
-java -Dspring.aot.enabled=true -agentlib:native-image-agent=config-output-dir=./out/ -jar target/image-metadata-commons-imaging-3.0.1.jar
-
-
-
+Image Metadata is licensed under the link:LICENSE[Apache License] (ASL), Version 2.0.

@@ -21,7 +21,11 @@ import java.awt.FontFormatException;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -254,10 +258,12 @@ public class DefaultImageService implements ImageService {
 			Font montserratSemiBold = Font.createFont(Font.TRUETYPE_FONT, stream);
 			//Font montserratSemiBold = Font.createFont(Font.TRUETYPE_FONT, fontAsFile);
 			font = montserratSemiBold.deriveFont(20f);
-		} catch (FontFormatException ex) {
+		}
+		catch (FontFormatException ex) {
 			ex.printStackTrace();
 			throw new IllegalStateException(ex);
-		} catch (IOException ex) {
+		}
+		catch (IOException ex) {
 			ex.printStackTrace();
 			throw new IllegalStateException(ex);
 		}

@@ -2,17 +2,17 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-<!--	<parent>-->
-<!--		<groupId>com.hillert.metadata</groupId>-->
-<!--		<artifactId>image-metadata-parent</artifactId>-->
-<!--		<version>1.0.0-SNAPSHOT</version>-->
-<!--	</parent>-->
 	<parent>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.0.1</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<groupId>com.hillert.metadata</groupId>
+		<artifactId>image-metadata-parent</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
 	</parent>
+<!--	<parent>-->
+<!--		<groupId>org.springframework.boot</groupId>-->
+<!--		<artifactId>spring-boot-starter-parent</artifactId>-->
+<!--		<version>3.0.1</version>-->
+<!--		<relativePath/> &lt;!&ndash; lookup parent from repository &ndash;&gt;-->
+<!--	</parent>-->
 	<artifactId>image-metadata-commons-imaging</artifactId>
 
 	<name>Image Metadata Commons Imaging Demo</name>
@@ -29,7 +29,6 @@
 
 		<!-- plugin dependency versions -->
 
-		<dependency-check-maven.version>7.1.1</dependency-check-maven.version>
 		<maven-checkstyle-plugin.version>3.1.2</maven-checkstyle-plugin.version>
 		<checkstyle.version>10.6.0</checkstyle.version>
 		<spring-javaformat-checkstyle.version>0.0.35</spring-javaformat-checkstyle.version>
@@ -42,6 +41,18 @@
 		<xerces.version>2.12.2</xerces.version>
 
 	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-dependencies</artifactId>
+				<type>pom</type>
+				<version>${spring-boot.version}</version>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 
 	<dependencies>
 		<dependency>

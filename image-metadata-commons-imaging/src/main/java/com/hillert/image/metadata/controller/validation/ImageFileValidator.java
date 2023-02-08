@@ -23,6 +23,10 @@ import org.springframework.web.multipart.MultipartFile;
 /**
  * {@link ConstraintValidator} that ensures that a provided file is provided and
  * that only certain filetypes (mime-types) are supported.
+ *
+ * IMPORTANT: This is merely a convenience validator in case the mime-type is not supported. If the mime-type is
+ * accepted, proper backend validation of the image data shall still be performed.
+ *
  * @author Gunnar Hillert
  */
 public class ImageFileValidator implements ConstraintValidator<ValidImage, MultipartFile> {
@@ -54,7 +58,7 @@ public class ImageFileValidator implements ConstraintValidator<ValidImage, Multi
 		if (!isSupportedContentType(contentType)) {
 			context.disableDefaultConstraintViolation();
 			context.buildConstraintViolationWithTemplate(
-							"Only PNG or JPG images are allowed.")
+							"Only GIF, JPG, PNG images are allowed.")
 					.addConstraintViolation();
 
 			result = false;
@@ -65,6 +69,7 @@ public class ImageFileValidator implements ConstraintValidator<ValidImage, Multi
 
 	private boolean isSupportedContentType(String contentType) {
 		return contentType.equals("image/png")
+				|| contentType.equals("image/gif")
 				|| contentType.equals("image/jpg")
 				|| contentType.equals("image/jpeg");
 	}

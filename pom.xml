@@ -3,12 +3,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-dependencies</artifactId>
-		<version>3.0.1</version>
-		<relativePath/>
-	</parent>
 
 	<groupId>com.hillert.metadata</groupId>
 	<artifactId>image-metadata-parent</artifactId>
@@ -63,6 +57,11 @@
 		<image-metadata.root>${basedir}</image-metadata.root>
 
 		<java.version>17</java.version>
+		<resource.delimiter>@</resource.delimiter>
+		<maven.compiler.source>${java.version}</maven.compiler.source>
+		<maven.compiler.target>${java.version}</maven.compiler.target>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
 		<maven.minimum.version>3.8.6</maven.minimum.version>
 		<sonar.moduleKey>${project.artifactId}</sonar.moduleKey>
@@ -70,9 +69,11 @@
 		<!-- plugin dependency versions -->
 
 		<dependency-check-maven.version>7.1.1</dependency-check-maven.version>
-		<maven-checkstyle-plugin.version>3.1.2</maven-checkstyle-plugin.version>
 		<checkstyle.version>10.6.0</checkstyle.version>
+		<maven-checkstyle-plugin.version>3.1.2</maven-checkstyle-plugin.version>
+		<maven-enforcer-plugin.version>3.1.0</maven-enforcer-plugin.version>
 		<spring-javaformat-checkstyle.version>0.0.35</spring-javaformat-checkstyle.version>
+		<versions-maven-plugin.version>2.8.1</versions-maven-plugin.version>
 
 		<!-- main dependency versions -->
 		<apache-commons-imaging.version>1.0-alpha3</apache-commons-imaging.version>
@@ -139,6 +140,26 @@
 						</execution>
 					</executions>
 				</plugin>
+				<plugin>
+					<groupId>org.graalvm.buildtools</groupId>
+					<artifactId>native-maven-plugin</artifactId>
+					<extensions>true</extensions>
+				</plugin>
+				<plugin>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-maven-plugin</artifactId>
+					<executions>
+						<execution>
+							<id>repackage</id>
+							<goals>
+								<goal>repackage</goal>
+							</goals>
+						</execution>
+					</executions>
+					<configuration>
+						<mainClass>${start-class}</mainClass>
+					</configuration>
+				</plugin>
 			</plugins>
 		</pluginManagement>
 
@@ -166,30 +187,91 @@
 					</execution>
 				</executions>
 			</plugin>
-
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>${maven-javadoc-plugin.version}</version>
-				<configuration>
-					<source>${java.version}</source>
-					<detectJavaApiLink>false</detectJavaApiLink>
-					<failOnError>false</failOnError>
-				</configuration>
-				<executions>
-					<execution>
-						<id>attach-javadocs</id>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-						<inherited>true</inherited>
-					</execution>
-				</executions>
-			</plugin>
 		</plugins>
 	</build>
 
 	<profiles>
+		<profile>
+			<id>native</id>
+			<activation>
+				<property>
+					<name>nativeCompile</name>
+				</property>
+			</activation>
+			<build>
+				<pluginManagement>
+					<plugins>
+						<plugin>
+							<groupId>org.springframework.boot</groupId>
+							<artifactId>spring-boot-maven-plugin</artifactId>
+							<configuration>
+								<image>
+									<builder>paketobuildpacks/builder:full</builder>
+									<env>
+										<BP_NATIVE_IMAGE>true</BP_NATIVE_IMAGE>
+									</env>
+								</image>
+							</configuration>
+							<executions>
+								<execution>
+									<id>process-aot</id>
+									<goals>
+										<goal>process-aot</goal>
+									</goals>
+								</execution>
+								<execution>
+									<id>build-image-no-fork</id>
+									<goals>
+										<goal>build-image-no-fork</goal>
+									</goals>
+									<phase>package</phase>
+									<configuration>
+										<skip>false</skip>
+									</configuration>
+								</execution>
+							</executions>
+						</plugin>
+						<plugin>
+							<groupId>org.graalvm.buildtools</groupId>
+							<artifactId>native-maven-plugin</artifactId>
+							<configuration>
+								<classesDirectory>${project.build.outputDirectory}</classesDirectory>
+								<metadataRepository>
+									<enabled>true</enabled>
+								</metadataRepository>
+								<requiredVersion>22.3</requiredVersion>
+							</configuration>
+							<executions>
+								<execution>
+									<id>add-reachability-metadata</id>
+									<goals>
+										<goal>add-reachability-metadata</goal>
+									</goals>
+								</execution>
+								<execution>
+									<id>build-native</id>
+									<goals>
+										<goal>compile-no-fork</goal>
+									</goals>
+									<phase>${native-maven-build-phase}</phase>
+								</execution>
+							</executions>
+						</plugin>
+					</plugins>
+				</pluginManagement>
+			</build>
+		</profile>
+		<profile>
+			<id>nativeCompile</id>
+			<activation>
+				<property>
+					<name>nativeCompile</name>
+				</property>
+			</activation>
+			<properties>
+				<native-maven-build-phase>package</native-maven-build-phase>
+			</properties>
+		</profile>
 		<profile>
 			<id>versions</id>
 			<build>
@@ -197,9 +279,9 @@
 					<plugin>
 						<groupId>org.codehaus.mojo</groupId>
 						<artifactId>versions-maven-plugin</artifactId>
-						<version>2.8.1</version>
+						<version>${versions-maven-plugin.version}</version>
 						<configuration>
-							<rulesUri>file:///${session.executionRootDirectory}/src/rules.xml</rulesUri>
+							<rulesUri>${image-metadata.root}/src/rules.xml</rulesUri>
 						</configuration>
 						<executions>
 							<execution>

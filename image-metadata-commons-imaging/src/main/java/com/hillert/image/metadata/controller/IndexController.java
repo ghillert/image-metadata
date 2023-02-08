@@ -67,7 +67,6 @@ public class IndexController {
 
 	@GetMapping({"/"})
 	public String index(Model model) {
-
 		model.addAttribute("imageUploadForm", new ImageUploadForm());
 		model.addAttribute("uploadSizeLimit", this.multipartProperties.getMaxFileSize().toMegabytes());
 		model.addAttribute("files", this.imageService.loadAll()
@@ -90,9 +89,9 @@ public class IndexController {
 	}
 
 	@GetMapping({"/image-details/{filename:.+}"})
-	public String getImageDetails(@PathVariable String filename, Model model, TimeZone timezone) {
+	public String getImageDetails(@PathVariable(name = "filename") String filename, Model model, TimeZone timezone) {
 
-		Metadata metadata = this.metadataService.getExifData(this.imageService.loadAsResource(filename));
+		final Metadata metadata = this.metadataService.getExifData(this.imageService.loadAsResource(filename));
 		metadata.setTimeZone(timezone.toZoneId());
 		model.addAttribute("filename", filename);
 
@@ -111,7 +110,7 @@ public class IndexController {
 			return "index";
 		}
 
-		MultipartFile file = imageUploadForm.getImageFile();
+		final MultipartFile file = imageUploadForm.getImageFile();
 		this.metadataService.getExifData(file.getResource());
 		this.imageService.store(file);
 
@@ -131,10 +130,10 @@ public class IndexController {
 	@GetMapping("/images/{filename:.+}")
 	@ResponseBody
 	public ResponseEntity<Resource> serveFile(
-			@PathVariable String filename,
-			@RequestParam(required = false) Integer width,
-			@RequestParam(required = false) ImageLoaderType imageLoaderType,
-			@RequestParam(required = false, defaultValue = "false") boolean download) throws IOException {
+			@PathVariable(name = "filename") String filename,
+			@RequestParam(name = "width", required = false) Integer width,
+			@RequestParam(name = "imageLoaderType", required = false) ImageLoaderType imageLoaderType,
+			@RequestParam(name = "download", required = false, defaultValue = "false") boolean download) throws IOException {
 		final Resource file = this.imageService.loadAsResource(filename);
 		final BufferedImage bufferedImage = this.imageService.loadAsBufferedImage(file, imageLoaderType);
 		final byte[] imageData = this.imageService.resizeImage(bufferedImage, filename, width, imageLoaderType);

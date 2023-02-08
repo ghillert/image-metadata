@@ -21,7 +21,7 @@ import jakarta.validation.constraints.NotNull;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
- * Contains formdata when uploading an image file.
+ * Contains form data when uploading an image file.
  * @author Gunnar Hillert
  */
 public class ImageUploadForm {

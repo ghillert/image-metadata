@@ -51,11 +51,6 @@ public class ExceptionHandling {
 	@ExceptionHandler(MultipartException.class)
 	public String multipartErrorHandler(MultipartException ex,
 					RedirectAttributes redirectAttributes) throws Exception {
-//		String errorMessage = String.format(
-//				"Please double-check the file that you are trying to upload. It may be too big. Uploaded files cannot"
-//						+ "be bigger than <strong>%sMB</strong>."
-//						+ " Please go back and upload a smaller image file.", multipartProperties.getMaxFileSize().toMegabytes());
-//		redirectAttributes.addFlashAttribute("error", errorMessage);
 		return "redirect:/uploadError";
 	}
 }
