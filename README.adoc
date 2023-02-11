@@ -32,7 +32,6 @@ https://www.jianshu.com/p/a53ae350f845?v=1669292961020
 
 Run Agent
 
-java -Dspring.aot.enabled=true -agentlib:native-image-agent=config-output-dir=./out/ -jar target/image-metadata-commons-imaging-3.0.1.jar
-
+ccccccccccccc
 
 

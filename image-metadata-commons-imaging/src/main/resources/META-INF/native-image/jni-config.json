@@ -304,10 +304,6 @@
   "methods":[{"name":"getGlyphMetrics","parameterTypes":["int"] }]
 },
 {
-  "name":"sun.font.FontUtilities",
-  "methods":[{"name":"debugFonts","parameterTypes":[] }]
-},
-{
   "name":"sun.font.FreetypeFontScaler",
   "methods":[{"name":"invalidateScaler","parameterTypes":[] }]
 },

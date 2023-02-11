@@ -162,24 +162,6 @@
   ]
 },
 {
-  "name":"com.fasterxml.jackson.dataformat.cbor$CBORFactory"
-},
-{
-  "name":"com.fasterxml.jackson.dataformat.cbor.CBORFactory"
-},
-{
-  "name":"com.fasterxml.jackson.dataformat.smile$SmileFactory"
-},
-{
-  "name":"com.fasterxml.jackson.dataformat.smile.SmileFactory"
-},
-{
-  "name":"com.fasterxml.jackson.dataformat.xml$XmlMapper"
-},
-{
-  "name":"com.fasterxml.jackson.dataformat.xml.XmlMapper"
-},
-{
   "name":"com.fasterxml.jackson.datatype.jdk8.Jdk8Module",
   "methods":[{"name":"<init>","parameterTypes":[] }]
 },
@@ -191,12 +173,6 @@
   "name":"com.fasterxml.jackson.module.paramnames.ParameterNamesModule",
   "queryAllDeclaredMethods":true,
   "methods":[{"name":"setupModule","parameterTypes":["com.fasterxml.jackson.databind.Module$SetupContext"] }]
-},
-{
-  "name":"com.google.gson$Gson"
-},
-{
-  "name":"com.google.gson.Gson"
 },
 {
   "name":"com.hillert.image.metadata.MetadataDemoApplication",
@@ -288,16 +264,6 @@
   ]
 },
 {
-  "name":"com.hillert.image.metadata.model.GnssInfo",
-  "allDeclaredFields":true,
-  "queryAllPublicMethods":true,
-  "methods":[
-    {"name":"getElevation","parameterTypes":[] }, 
-    {"name":"getLatitude","parameterTypes":[] }, 
-    {"name":"getLongitude","parameterTypes":[] }
-  ]
-},
-{
   "name":"com.hillert.image.metadata.service.DefaultImageService",
   "queryAllDeclaredMethods":true,
   "methods":[
@@ -341,83 +307,8 @@
   "methods":[{"name":"<init>","parameterTypes":[] }]
 },
 {
-  "name":"com.rometools.rome.feed$WireFeed"
-},
-{
-  "name":"com.rometools.rome.feed.WireFeed"
-},
-{
-  "name":"com.samskivert.mustache$Template"
-},
-{
-  "name":"com.samskivert.mustache.Template"
-},
-{
   "name":"com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl",
   "methods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
-  "name":"freemarker.template$Configuration"
-},
-{
-  "name":"freemarker.template.Configuration"
-},
-{
-  "name":"groovy.text$TemplateEngine"
-},
-{
-  "name":"groovy.text.TemplateEngine"
-},
-{
-  "name":"io.micrometer.context$ContextSnapshot"
-},
-{
-  "name":"io.micrometer.context.ContextSnapshot"
-},
-{
-  "name":"io.reactivex.rxjava3.core$Flowable"
-},
-{
-  "name":"io.reactivex.rxjava3.core.Flowable"
-},
-{
-  "name":"io.smallrye.mutiny$Multi"
-},
-{
-  "name":"io.smallrye.mutiny.Multi"
-},
-{
-  "name":"jakarta.ejb.EJB"
-},
-{
-  "name":"jakarta.faces.context$FacesContext"
-},
-{
-  "name":"jakarta.faces.context.FacesContext"
-},
-{
-  "name":"jakarta.inject$Provider"
-},
-{
-  "name":"jakarta.inject$Qualifier"
-},
-{
-  "name":"jakarta.inject.Provider"
-},
-{
-  "name":"jakarta.inject.Qualifier"
-},
-{
-  "name":"jakarta.json.bind$Jsonb"
-},
-{
-  "name":"jakarta.json.bind.Jsonb"
-},
-{
-  "name":"jakarta.persistence.Persistence"
-},
-{
-  "name":"jakarta.persistence.PersistenceContext"
 },
 {
   "name":"jakarta.servlet.GenericFilter",
@@ -436,13 +327,10 @@
   "queryAllPublicMethods":true
 },
 {
+  "name":"jakarta.servlet.http.HttpServlet"
+},
+{
   "name":"jakarta.servlet.http.PushBuilder"
-},
-{
-  "name":"jakarta.servlet.jsp.jstl.core$Config"
-},
-{
-  "name":"jakarta.servlet.jsp.jstl.core.Config"
 },
 {
   "name":"jakarta.validation.Valid",
@@ -465,15 +353,6 @@
     {"name":"message","parameterTypes":[] }, 
     {"name":"payload","parameterTypes":[] }
   ]
-},
-{
-  "name":"jakarta.xml.bind$Binder"
-},
-{
-  "name":"jakarta.xml.bind.Binder"
-},
-{
-  "name":"jakarta.xml.ws.WebServiceRef"
 },
 {
   "name":"java.io.FilePermission"
@@ -523,7 +402,7 @@
   "queryAllDeclaredMethods":true
 },
 {
-  "name":"java.lang.WrongThreadException"
+  "name":"java.lang.Thread"
 },
 {
   "name":"java.lang.constant.Constable",
@@ -540,6 +419,9 @@
 {
   "name":"java.lang.reflect.GenericDeclaration",
   "queryAllPublicMethods":true
+},
+{
+  "name":"java.lang.reflect.Method"
 },
 {
   "name":"java.lang.reflect.ParameterizedType",
@@ -584,6 +466,9 @@
 {
   "name":"java.nio.channels.SocketChannel",
   "methods":[{"name":"open","parameterTypes":["java.net.ProtocolFamily"] }]
+},
+{
+  "name":"java.nio.file.Files"
 },
 {
   "name":"java.security.AllPermission"
@@ -654,9 +539,6 @@
   "methods":[{"name":"<init>","parameterTypes":[] }]
 },
 {
-  "name":"javafx.beans.value.ObservableValue"
-},
-{
   "name":"javax.imageio.spi.ImageReaderSpi"
 },
 {
@@ -671,52 +553,19 @@
   "name":"javax.imageio.spi.ImageWriterSpi"
 },
 {
-  "name":"javax.money$MonetaryAmount"
-},
-{
-  "name":"javax.money.MonetaryAmount"
-},
-{
   "name":"javax.naming.InitialContext"
 },
 {
-  "name":"javax.smartcardio.CardPermission"
+  "name":"jdk.internal.reflect.DelegatingMethodAccessorImpl"
 },
 {
-  "name":"kotlin$Metadata"
+  "name":"jdk.internal.reflect.NativeMethodAccessorImpl"
 },
 {
-  "name":"kotlin.Metadata"
+  "name":"org.apache.catalina.authenticator.AuthenticatorBase"
 },
 {
-  "name":"kotlin.reflect.full$KClasses"
-},
-{
-  "name":"kotlin.reflect.full.KClasses"
-},
-{
-  "name":"kotlinx.coroutines.reactor$MonoKt"
-},
-{
-  "name":"kotlinx.coroutines.reactor.MonoKt"
-},
-{
-  "name":"kotlinx.serialization.cbor$Cbor"
-},
-{
-  "name":"kotlinx.serialization.cbor.Cbor"
-},
-{
-  "name":"kotlinx.serialization.json$Json"
-},
-{
-  "name":"kotlinx.serialization.json.Json"
-},
-{
-  "name":"kotlinx.serialization.protobuf$ProtoBuf"
-},
-{
-  "name":"kotlinx.serialization.protobuf.ProtoBuf"
+  "name":"org.apache.catalina.connector.CoyoteAdapter"
 },
 {
   "name":"org.apache.catalina.core.ApplicationContextFacade",
@@ -780,6 +629,21 @@
   ]
 },
 {
+  "name":"org.apache.catalina.core.ApplicationFilterChain"
+},
+{
+  "name":"org.apache.catalina.core.StandardContextValve"
+},
+{
+  "name":"org.apache.catalina.core.StandardEngineValve"
+},
+{
+  "name":"org.apache.catalina.core.StandardHostValve"
+},
+{
+  "name":"org.apache.catalina.core.StandardWrapperValve"
+},
+{
   "name":"org.apache.catalina.loader.JdbcLeakPrevention",
   "methods":[
     {"name":"<init>","parameterTypes":[] }, 
@@ -791,6 +655,12 @@
   "methods":[{"name":"<init>","parameterTypes":[] }]
 },
 {
+  "name":"org.apache.catalina.valves.ErrorReportValve"
+},
+{
+  "name":"org.apache.coyote.AbstractProcessorLight"
+},
+{
   "name":"org.apache.coyote.AbstractProtocol",
   "methods":[
     {"name":"getAddress","parameterTypes":[] }, 
@@ -798,6 +668,9 @@
     {"name":"setPort","parameterTypes":["int"] }, 
     {"name":"setProperty","parameterTypes":["java.lang.String","java.lang.String"] }
   ]
+},
+{
+  "name":"org.apache.coyote.AbstractProtocol$ConnectionHandler"
 },
 {
   "name":"org.apache.coyote.http11.AbstractHttp11Protocol",
@@ -808,20 +681,11 @@
   "queryAllPublicMethods":true
 },
 {
+  "name":"org.apache.coyote.http11.Http11Processor"
+},
+{
   "name":"org.apache.el.ExpressionFactoryImpl",
   "methods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
-  "name":"org.apache.jasper.servlet$JspServlet"
-},
-{
-  "name":"org.apache.jasper.servlet.JspServlet"
-},
-{
-  "name":"org.apache.logging.log4j.core.impl$Log4jContextFactory"
-},
-{
-  "name":"org.apache.logging.log4j.core.impl.Log4jContextFactory"
 },
 {
   "name":"org.apache.logging.log4j.spi.ExtendedLogger"
@@ -838,6 +702,21 @@
   "queryAllPublicMethods":true
 },
 {
+  "name":"org.apache.tomcat.util.net.NioEndpoint$SocketProcessor"
+},
+{
+  "name":"org.apache.tomcat.util.net.SocketProcessorBase"
+},
+{
+  "name":"org.apache.tomcat.util.threads.TaskThread$WrappingRunnable"
+},
+{
+  "name":"org.apache.tomcat.util.threads.ThreadPoolExecutor"
+},
+{
+  "name":"org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker"
+},
+{
   "name":"org.apache.tomcat.websocket.server.WsFilter",
   "queryAllDeclaredMethods":true
 },
@@ -848,12 +727,6 @@
 {
   "name":"org.apache.xerces.parsers.XIncludeAwareParserConfiguration",
   "methods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
-  "name":"org.eclipse.core.runtime$FileLocator"
-},
-{
-  "name":"org.eclipse.core.runtime.FileLocator"
 },
 {
   "name":"org.graalvm.nativeimage.ImageInfo",
@@ -875,26 +748,11 @@
   "methods":[{"name":"<init>","parameterTypes":["org.jboss.logging.Logger"] }]
 },
 {
-  "name":"org.hibernate.validator.internal.util.logging.Log_$logger_en"
-},
-{
-  "name":"org.hibernate.validator.internal.util.logging.Log_$logger_en_GB"
-},
-{
   "name":"org.hibernate.validator.internal.util.logging.Messages_$bundle",
   "fields":[{"name":"INSTANCE"}]
 },
 {
-  "name":"org.hibernate.validator.internal.util.logging.Messages_$bundle_en"
-},
-{
-  "name":"org.hibernate.validator.internal.util.logging.Messages_$bundle_en_GB"
-},
-{
   "name":"org.jboss.logging.Logger"
-},
-{
-  "name":"org.joda.time.ReadableInstant"
 },
 {
   "name":"org.slf4j.Logger"
@@ -1369,7 +1227,10 @@
 {
   "name":"org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController",
   "queryAllDeclaredMethods":true,
-  "methods":[{"name":"error","parameterTypes":["jakarta.servlet.http.HttpServletRequest"] }]
+  "methods":[
+    {"name":"error","parameterTypes":["jakarta.servlet.http.HttpServletRequest"] }, 
+    {"name":"errorHtml","parameterTypes":["jakarta.servlet.http.HttpServletRequest","jakarta.servlet.http.HttpServletResponse"] }
+  ]
 },
 {
   "name":"org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration",
@@ -1529,15 +1390,9 @@
   "methods":[{"name":"<init>","parameterTypes":[] }]
 },
 {
-  "name":"org.springframework.boot.logging.java.JavaLoggingSystem.Factory"
-},
-{
   "name":"org.springframework.boot.logging.log4j2.Log4J2LoggingSystem$Factory",
   "queryAllPublicConstructors":true,
   "methods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
-  "name":"org.springframework.boot.logging.log4j2.Log4J2LoggingSystem.Factory"
 },
 {
   "name":"org.springframework.boot.logging.logback.ColorConverter",
@@ -1551,9 +1406,6 @@
   "name":"org.springframework.boot.logging.logback.LogbackLoggingSystem$Factory",
   "queryAllPublicConstructors":true,
   "methods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
-  "name":"org.springframework.boot.logging.logback.LogbackLoggingSystem.Factory"
 },
 {
   "name":"org.springframework.boot.reactor.DebugAgentEnvironmentPostProcessor",
@@ -1691,9 +1543,6 @@
   "queryAllDeclaredMethods":true
 },
 {
-  "name":"org.springframework.hateoas.server.mvc.TypeConstrainedMappingJackson2HttpMessageConverter"
-},
-{
   "name":"org.springframework.http.converter.json.GsonHttpMessageConverter"
 },
 {
@@ -1793,17 +1642,17 @@
   "methods":[{"name":"noMatchingExceptionHandler","parameterTypes":[] }]
 },
 {
+  "name":"org.springframework.web.method.support.InvocableHandlerMethod"
+},
+{
   "name":"org.springframework.web.multipart.MultipartFile",
   "queryAllDeclaredMethods":true
 },
 {
-  "name":"org.springframework.web.reactive$DispatcherHandler"
+  "name":"org.springframework.web.servlet.DispatcherServlet"
 },
 {
-  "name":"org.springframework.web.reactive.DispatcherHandler"
-},
-{
-  "name":"org.springframework.web.reactive.result.view.View"
+  "name":"org.springframework.web.servlet.FrameworkServlet"
 },
 {
   "name":"org.springframework.web.servlet.View",
@@ -1870,8 +1719,17 @@
   "methods":[{"name":"handle","parameterTypes":[] }]
 },
 {
+  "name":"org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter"
+},
+{
   "name":"org.springframework.web.servlet.mvc.method.RequestMappingInfoHandlerMapping$HttpOptionsHandler",
   "methods":[{"name":"handle","parameterTypes":[] }]
+},
+{
+  "name":"org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter"
+},
+{
+  "name":"org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod"
 },
 {
   "name":"org.springframework.web.servlet.view.AbstractCachingViewResolver",
@@ -1954,11 +1812,6 @@
     {"name":"setMessageSource","parameterTypes":["org.springframework.context.MessageSource"] }, 
     {"name":"setTemplateEngineMessageSource","parameterTypes":["org.springframework.context.MessageSource"] }
   ]
-},
-{
-  "name":"org.thymeleaf.spring6.expression.Fields",
-  "queryAllPublicMethods":true,
-  "methods":[{"name":"errors","parameterTypes":["java.lang.String"] }]
 },
 {
   "name":"org.thymeleaf.spring6.expression.Mvc$Spring41MvcUriComponentsBuilderDelegate",
@@ -2099,20 +1952,21 @@
   "queryAllPublicMethods":true
 },
 {
-  "name":"reactor.core.publisher$Flux"
-},
-{
-  "name":"reactor.core.publisher.Flux"
-},
-{
-  "name":"reactor.tools.agent$ReactorDebugAgent"
-},
-{
-  "name":"reactor.tools.agent.ReactorDebugAgent"
+  "name":"sun.awt.Win32FontManager",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
 },
 {
   "name":"sun.java2d.marlin.DMarlinRenderingEngine",
   "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"sun.nio.fs.AbstractFileSystemProvider"
+},
+{
+  "name":"sun.nio.fs.WindowsException"
+},
+{
+  "name":"sun.nio.fs.WindowsFileSystemProvider"
 },
 {
   "name":"sun.security.provider.DRBG",
