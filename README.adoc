@@ -90,6 +90,9 @@ for more information:
 
 Not tested, yet, but should just work :-) See the instructions for Docker below.
 
+https://github.com/graalvm/mandrel/issues/189
+apt install gcc zlib1g-dev build-essential libfreetype6-dev
+
 === Docker
 
 _image-metadata-commons-imaging_ uses fonts, which on Linux require `fontconfig`
