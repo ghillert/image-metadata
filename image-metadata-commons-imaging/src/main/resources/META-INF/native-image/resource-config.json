@@ -44,6 +44,9 @@
       "pattern":"\\Qorg/apache/catalina/util/ServerInfo.properties\\E"
     }, 
     {
+      "pattern":"\\Qorg/springframework/web/util/HtmlCharacterEntityReferences.properties\\E"
+    }, 
+    {
       "pattern":"\\Qorg/thymeleaf/thymeleaf.properties\\E"
     }, 
     {

@@ -24,6 +24,7 @@ import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -45,6 +46,7 @@ import com.hillert.image.metadata.service.support.ImageLoaderType;
 import com.hillert.image.metadata.service.support.StorageException;
 import ij.ImagePlus;
 import ij.process.ImageProcessor;
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -238,35 +240,51 @@ public class DefaultImageService implements ImageService {
 
 		LOGGER.info("Current Width: {} - Target Width: {}.", currentWidth, targetWidth);
 
-		Resource fontResource = new ClassPathResource("/fonts/Montserrat-VariableFont_wght.ttf");
-		InputStream stream = null;
+//		Resource fontResource = new ClassPathResource("/fonts/Montserrat-SemiBold.ttf");
+//		InputStream stream = null;
+//
+//		try {
+//			stream = new BufferedInputStream(fontResource.getInputStream());
+//		}
+//		catch (IOException ex) {
+//			ex.printStackTrace();
+//		}
 
-		try {
-			stream = new BufferedInputStream(fontResource.getInputStream());
-		}
-		catch (IOException ex) {
-			ex.printStackTrace();
-		}
-//		File fontAsFile = new File("home/fonts/Montserrat-SemiBold.ttf");
-//		System.out.println("?????? " + fontAsFile.getAbsolutePath());
-
+		final String fontName = "Montserrat-SemiBold.ttf";
+		File tempDirFile = Files.createTempDirectory("metadata").toFile();
+		String tempDir = tempDirFile.getAbsolutePath();
+		Resource fontResource = new ClassPathResource("/fonts/" + fontName);
+		File destinationFontFile = new File(tempDir, fontName);
 		Font font;
 
 		try {
-			//System.out.println(fontResource.getFilename() + " Font length: .....>>>>>" + stream.readAllBytes().length);
-			Files.createTempFile("+~JF", ".tmp").toFile();
-			Font montserratSemiBold = Font.createFont(Font.TRUETYPE_FONT, stream);
-			//Font montserratSemiBold = Font.createFont(Font.TRUETYPE_FONT, fontAsFile);
-			font = montserratSemiBold.deriveFont(20f);
+			final InputStream stream = new BufferedInputStream(fontResource.getInputStream());
+			FileUtils.copyInputStreamToFile(stream, destinationFontFile);
+			LOGGER.info("Copied font '{}' to '{}'.", fontName, destinationFontFile.getAbsolutePath());
+			font = Font.createFont(Font.TRUETYPE_FONT, destinationFontFile);
+			font = font.deriveFont(20f);
 		}
 		catch (FontFormatException ex) {
 			ex.printStackTrace();
 			throw new IllegalStateException(ex);
 		}
 		catch (IOException ex) {
-			ex.printStackTrace();
-			throw new IllegalStateException(ex);
+			throw new IllegalStateException("Error creating font.", ex);
 		}
+
+//		try {
+//			//System.out.println(fontResource.getFilename() + " Font length: .....>>>>>" + stream.readAllBytes().length);
+//			Files.createTempFile("+~JF", ".tmp").toFile();
+//			Font montserratSemiBold = Font.createFont(Font.TRUETYPE_FONT, stream);
+//			//Font montserratSemiBold = Font.createFont(Font.TRUETYPE_FONT, fontAsFile);
+//			font = montserratSemiBold.deriveFont(20f);
+//		} catch (FontFormatException ex) {
+//			ex.printStackTrace();
+//			throw new IllegalStateException(ex);
+//		} catch (IOException ex) {
+//			ex.printStackTrace();
+//			throw new IllegalStateException(ex);
+//		}
 
 		ImageProcessor ip = image.getProcessor();
 

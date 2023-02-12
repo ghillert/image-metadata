@@ -90,9 +90,9 @@
     <main>
         <p th:text="${message}" th:if="${message ne null}" class="alert alert-primary"></p>
         <p th:text="${error}" th:if="${error ne null}" class="alert alert-danger"></p>
-        <ul>
-            <li th:each="err : ${#fields.errors('imageUploadForm.*')}" th:text="${err}" />
-        </ul>
+<!--        <ul th:if="${#fields.hasErrors('*')}">-->
+<!--            <li th:each="err : ${#fields.errors('imageUploadForm.*')}" th:text="${err}" />-->
+<!--        </ul>-->
 <!--        <div th:if="${#fields.hasAnyErrors()}">-->
 <!--            <ul>-->
 <!--                <li th:each="err : ${#fields.allErrors()}" th:text="${err}" />-->

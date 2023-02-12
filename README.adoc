@@ -119,3 +119,38 @@ java -Dspring.aot.enabled=true -agentlib:native-image-agent=config-output-dir=./
 == License
 
 Image Metadata is licensed under the link:LICENSE[Apache License] (ASL), Version 2.0.
+=======
+= Image Metadata processing using Java
+
+Examples for processing image metadata using Java
+
+== Requirements
+
+- Java 17
+- For native compilation: 22.3.r19-grl
+
+== Build
+
+```bash
+./mvn clean package
+```
+
+=== Native Image (local OS)
+
+```bash
+./mvnw clean package -Pnative
+```
+
+Windows
+
+x64 Native Tools Command Prompt for VS 2022
+/c/Users/hille/.sdkman/candidates/java/current/bin/java
+
+
+Resources
+
+https://www.jianshu.com/p/a53ae350f845?v=1669292961020
+
+
+Run Agent
+
