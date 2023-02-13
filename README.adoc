@@ -77,6 +77,15 @@ version for macOS will not run. There is an
 https://github.com/oracle/graal/issues/4124[open GitHub issue] at the GraalVM
 project.
 
+If you try, you will see an exception like the following:
+
+```
+2023-02-12T09:38:34.721-10:00 ERROR 65901 --- [nio-8080-exec-8] o.a.c.c.C.[.[.[/].[dispatcherServlet]    : Servlet.service() for servlet [dispatcherServlet] in context with path [] threw exception [Handler dispatch failed: java.lang.UnsatisfiedLinkError: no awt in java.library.path] with root cause
+
+java.lang.UnsatisfiedLinkError: no awt in java.library.path
+...
+```
+
 ==== Windows
 
 On Windows it is critical to compile the project using the
@@ -98,6 +107,8 @@ apt install gcc zlib1g-dev build-essential libfreetype6-dev
 _image-metadata-commons-imaging_ uses fonts, which on Linux require `fontconfig`
 to be installed. That's why I use `paketobuildpacks/builder:full` and not the
 default `paketobuildpacks/builder:tiny`.
+
+IMPORTANT: Please make sure your Docker daemon is running.
 
 ```bash
 ./mvnw -Pnative spring-boot:build-image
