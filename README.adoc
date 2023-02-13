@@ -131,7 +131,7 @@ default `paketobuildpacks/builder:tiny`.
 IMPORTANT: Please make sure your Docker daemon is running.
 
 ```bash
-./mvnw -Pnative spring-boot:build-image
+./mvnw -Pnative spring-boot:build-image -pl :image-metadata-commons-imaging
 docker run --rm -p 8080:8080 docker.io/library/image-metadata-commons-imaging:{current-version}
 ```
 

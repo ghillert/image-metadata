@@ -4,6 +4,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 
 import com.hillert.image.metadata.controller.validation.ImageFileValidator;
+import com.hillert.image.metadata.model.GnssInfo;
 import org.apache.xerces.impl.dv.dtd.DTDDVFactoryImpl;
 import org.apache.xerces.parsers.XIncludeAwareParserConfiguration;
 
@@ -22,6 +23,8 @@ public class MyRuntimeHints implements RuntimeHintsRegistrar {
 		hints.reflection().registerMethod(method, ExecutableMode.INVOKE);
 
 		hints.reflection().registerType(ImageFileValidator.class, MemberCategory.INVOKE_PUBLIC_CONSTRUCTORS);
+
+		hints.reflection().registerType(GnssInfo.class, MemberCategory.INVOKE_PUBLIC_METHODS);
 
 		hints.reflection().registerType(DTDDVFactoryImpl.class, MemberCategory.INVOKE_PUBLIC_CONSTRUCTORS);
 		hints.reflection().registerType(XIncludeAwareParserConfiguration.class, MemberCategory.INVOKE_PUBLIC_CONSTRUCTORS);
