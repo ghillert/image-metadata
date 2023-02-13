@@ -27,7 +27,7 @@ public class MyRuntimeHints implements RuntimeHintsRegistrar {
 		hints.reflection().registerType(XIncludeAwareParserConfiguration.class, MemberCategory.INVOKE_PUBLIC_CONSTRUCTORS);
 
 		Method getDefaultToolkitMethod = ReflectionUtils.findMethod(java.awt.Toolkit.class, "getDefaultToolkit");
-		hints.reflection().registerMethod(method, ExecutableMode.INVOKE);
+		hints.reflection().registerMethod(getDefaultToolkitMethod, ExecutableMode.INVOKE);
 
 		hints.resources().registerPattern("fonts/*");
 		hints.resources().registerPattern("static/*");

@@ -93,6 +93,26 @@ On Windows it is critical to compile the project using the
 for more information:
 
 - https://medium.com/graalvm/using-graalvm-and-native-image-on-windows-10-9954dc071311
+
+Loading the font sub-system reqires you to specify the Java Home directory:
+
+```
+image-metadata-commons-imaging.exe -Djava.home="%JAVA_HOME%"
+```
+
+While this will work, you can reduce the contents of `java.home` to just one file `fontconfig.properties` with the contents:
+
+```properties
+version=1
+sequence.allfonts=default
+```
+
+For more information see:
+
+- https://github.com/adoptium/temurin-build/issues/693
+
+For completeness, the following resource shall be mentioned as well, but it turns out, not all mentioned files are needed:
+
 - https://www.jianshu.com/p/a53ae350f845?v=1669292961020
 
 ==== Linux
