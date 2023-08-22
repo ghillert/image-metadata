@@ -19,13 +19,16 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
 /**
- * GNSS (including GPS) related metadata represented by core Java classes, e.g.
- * temporal properties.
+ * GNSS (including GPS) related metadata represented by core Java classes, e.g. temporal
+ * properties.
+ *
  * @author Gunnar Hillert
  * @see Metadata
  */
 public class GnssInfo {
+
 	double latitude;
+
 	double longitude;
 
 	double elevation;
@@ -87,4 +90,5 @@ public class GnssInfo {
 	public void setUserTimeZone(ZoneId userTimeZone) {
 		this.userTimeZone = userTimeZone;
 	}
+
 }

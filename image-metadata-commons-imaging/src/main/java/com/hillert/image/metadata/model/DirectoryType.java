@@ -23,6 +23,7 @@ import org.springframework.util.Assert;
 
 /**
  * An enum representing the various metadata categories that are supported.
+ *
  * @author Gunnar Hillert
  * @see Directory
  */
@@ -56,9 +57,20 @@ public enum DirectoryType {
 	/**
 	 * GIF related metadata.
 	 */
-	GIF("GIF", "Graphics Interchange Format");
+	GIF("GIF", "Graphics Interchange Format"),
+
+	/**
+	 * GIF related metadata.
+	 */
+	WINDOWS("WINDOWS", "Windows-specific EXIF tags"),
+
+	/**
+	 * Generic (other) metadata.
+	 */
+	GENERIC("GENERIC", "Generic Image Metadata");
 
 	private String name;
+
 	private String description;
 
 	/**
@@ -92,8 +104,7 @@ public enum DirectoryType {
 	}
 
 	public static List<DirectoryType> getValuesAsList() {
-		return Stream.of(DirectoryType.values())
-		.sorted(Comparator.comparing(DirectoryType::getName))
-		.toList();
+		return Stream.of(DirectoryType.values()).sorted(Comparator.comparing(DirectoryType::getName)).toList();
 	}
+
 }

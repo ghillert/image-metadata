@@ -17,10 +17,19 @@ package com.hillert.image.metadata.service.support;
 
 /**
  * {@link RuntimeException} that is throw in case image data cannot be processed.
+ *
  * @author Gunnar Hillert
  */
 public class ImageProcessingException extends RuntimeException {
+
+	private static final long serialVersionUID = 1;
+
 	public ImageProcessingException(String message, Throwable cause) {
 		super(message, cause);
 	}
+
+	public ImageProcessingException(String message) {
+		super(message);
+	}
+
 }

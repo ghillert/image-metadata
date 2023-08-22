@@ -13,16 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hillert.image.metadata.service;
+package com.hillert.image.metadata.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
  * Storage-related Spring Boot configuration properties.
+ *
  * @author Gunnar Hillert
  */
 @ConfigurationProperties("storage")
-public class StorageProperties {
+public class StorageConfigProperties {
 
 	/**
 	 * Folder location for storing files.

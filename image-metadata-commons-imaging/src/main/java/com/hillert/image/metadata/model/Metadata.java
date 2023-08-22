@@ -17,16 +17,13 @@ package com.hillert.image.metadata.model;
 
 import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.springframework.util.Assert;
-
 /**
  * Holder for extracted image metadata. Inspired by the meta-data-extractor project:
- * https://github.com/drewnoakes/metadata-extractor
+ * <a href="https://github.com/drewnoakes/metadata-extractor">https://github.com/drewnoakes/metadata-extractor</a>
  * @author Gunnar Hillert
  */
 public class Metadata {
@@ -38,21 +35,11 @@ public class Metadata {
 		return this.directories;
 	}
 
-	public <T extends Directory> Collection<T> getDirectoriesOfType(Class<T> type) {
-		List<T> directories = new ArrayList<T>();
-		for (Directory dir : this.directories) {
-			if (type.isAssignableFrom(dir.getClass())) {
-				directories.add((T) dir);
-			}
-		}
-		return directories;
-	}
-
 	public Map<DirectoryType, List<Directory>> getDirectoriesPerType() {
 		final Map<DirectoryType, List<Directory>> directoryMap = new TreeMap<>();
 
 		for (Directory directory : this.getDirectories()) {
-			final List<Directory> directoriesByType = directoryMap.getOrDefault(directory.getDirectoryType(), new ArrayList<Directory>());
+			final List<Directory> directoriesByType = directoryMap.getOrDefault(directory.getDirectoryType(), new ArrayList<>());
 			directoriesByType.add(directory);
 			directoryMap.put(directory.getDirectoryType(), directoriesByType);
 		}
@@ -62,29 +49,6 @@ public class Metadata {
 
 	public int getDirectoryCount() {
 		return this.directories.size();
-	}
-
-	public <T extends Directory> void addDirectory(T directory) {
-		Assert.notNull(directory, "Directory may not be null.");
-		this.directories.add(directory);
-	}
-
-	public <T extends Directory> T getFirstDirectoryOfType(Class<T> type) {
-		for (Directory dir : this.directories) {
-			if (type.isAssignableFrom(dir.getClass())) {
-				return (T) dir;
-			}
-		}
-		return null;
-	}
-
-	public boolean containsDirectoryOfType(Class<? extends Directory> type) {
-		for (Directory dir : this.directories) {
-			if (type.isAssignableFrom(dir.getClass())) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 	@Override

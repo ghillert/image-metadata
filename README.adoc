@@ -5,15 +5,84 @@
 This repository contains examples for processing image metadata using Java. Currently, the following module
 is available:
 
-*image-metadata-commons-imaging*
+- *image-metadata-commons-imaging*
 
-This https://spring.io/projects/spring-boot[Spring Boot] 3 application will allow you to upload images (JPG, PNG, GIF) and the application will extract the
-metadata from the files. This includes:
+This https://spring.io/projects/spring-boot[Spring Boot] 3 application will allow you to upload images (JPG, PNG, GIF)
+and the application will extract the metadata from those files using
+https://commons.apache.org/proper/commons-imaging/[Apache Commons Imaging]. This includes:
 
 - *EXIF* (Exchangeable image file format)
 - *IPTC* (International Press Telecommunications Council)
 - *XMP* (eXtensible Metadata Platform)
 - Generic *file* metadata
+
+To learn more about the alphabet soup, see my blog post:
+https://medium.com/@hillert/read-write-image-metadata-with-java-part-1-d5e2057c80d9[Read & Write Image Metadata with Java — Part 1]
+This demo application also provides the following additional features:
+
+- Remove all image metadata
+- Populate image metadata such as image title and reference id
+- Ability to resize images
+- Slightly sharpen resized images using a Gaussian Unsharp Mask
+- Add a font label to resized images
+- Ability to load images using ImageIO or AWT Toolkit (To study performance differences)
+- Ability to download the stored image
+
+NOTE: Image metadata is manipulated during file upload. Any other manipulation such as resizing is done during image
+retrieval. This is purely a demo app and not meant to be production ready.
+
+== UI Options
+
+=== File upload
+
+The main input field (and only mandatory input field) is the file upload option. You can select
+any image of the following type to extract metadata from:
+
+- JPG
+- PNG
+- GIF
+
+=== Title
+
+The title input field, will populate
+
+- the XMP `Title` tag of the Dublin Core namespace.
+- the IPTC `Object Name` field
+- the EXIF `Image Description` Field
+
+In case you also selected the `Remove Metadata` checkbox, we will also populate the `XPTitle` EXIF tag.
+
+- https://exiftool.org/TagNames/XMP.html#dc[XMP Dublin Core (dc) namespace tags]
+- https://exiftool.org/TagNames/EXIF.html
+- https://exiftool.org/TagNames/IPTC.html#ApplicationRecord
+
+=== Reference ID
+
+Populates the IPTC field `OriginalTransmissionReference` as well as the XMP tag `TransmissionReference`. These two fields
+are commonly used as a job identifier. So if you need to tie your images to e.g. a database record, this might be a useful
+field to know about. For more information, please also see the following links for more information:
+
+- https://exiftool.org/TagNames/XMP.html#photoshop[XMP photoshop Tags]
+- https://exiftool.org/TagNames/IPTC.html#ApplicationRecord[IPTC ApplicationRecord Tags]
+
+=== Remove Metadata
+
+Removes all _IPTC_, _EXIF_ and _XMP_ metadata.
+
+=== Populate Windows Tags
+
+The following tags are the Windows-specific exif tags:
+
+- XPTitle (Populated by EXIF tag ImageDescription)
+- XPComment
+- XPAuthor (Populated by EXIF tag Artist)
+- XPKeywords
+- XPSubject
+- Rating
+- RatingPercent
+
+If the checkbox is selected AND the Caption/Title input field is populated, we will populate the `xptitle` tag.
+Please also see the EXIF tag documentation at https://exiftool.org/TagNames/EXIF.html.
 
 == Building from Source
 
@@ -21,7 +90,9 @@ metadata from the files. This includes:
 
 - https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html[Java 17]
 - https://help.github.com/set-up-git-redirect[Git]
-- For native compilation: https://www.graalvm.org/downloads/[GraalVM 22.3.1]
+- For native compilation:
+  * https://bell-sw.com/pages/downloads/native-image-kit/[Liberica Native Image Kit] (NIK) (tested)
+  * https://www.graalvm.org/downloads/[GraalVM 22.3.2] (Not fully tested)
 
 === Check out source code
 
@@ -35,153 +106,168 @@ cd image-metadata
 
 === Build
 
-```bash
+[source,bash,indent=0]
+----
 ./mvnw clean package
-```
+----
 
 === Run
 
-```bash
-java -jar ./image-metadata-commons-imaging/image-metadata-commons-imaging-{current-version}.jar
-```
+[source,bash,indent=0,subs=attributes]
+----
+java -jar ./image-metadata-commons-imaging/target/image-metadata-commons-imaging-{current-version}.jar
+----
+
+Open your browser and go to http://localhost:8080/
 
 === Run + Run in one go
 
-```bash
-./mvnw spring:run
-```
+[source,bash,indent=0,subs=attributes]
+----
+./mvnw spring-boot:run -pl image-metadata-commons-imaging
+----
 
 == Going Native
 
-=== Local Native Image
+Native compilation has been a bit of a moving target when using AWT classes. Luckily the situation is
+continuously improving. For instance until recently the story on Windows was a bit more involved, requiring
+to compile the project using the *x64 Native Tools Command Prompt for VS 2022* (See the following
+https://medium.com/graalvm/using-graalvm-and-native-image-on-windows-10-9954dc071311[blog post]
+for more information.)
+
+Luckily as of the latest GraalVM for JDK 17.0.8 release the situation on Windows is much improved -
+See the following https://medium.com/graalvm/a-new-graalvm-release-and-new-free-license-4aab483692f5[blog post]
+for details.
+
+=== Creating a Local Native Image
 
 Creating a local image should be as easy as:
 
-```bash
+[source,bash,indent=0,subs=attributes]
+----
 ./mvnw clean package -DnativeCompile
-```
+----
 
 This shorthand system property will activate the Maven profiles:
 
 - native
 - nativeCompile
 
-```bash
+So you can also use:
+
+[source,bash,indent=0,subs=attributes]
+----
 ./mvnw clean package -Pnative,nativeCompile
-```
+----
+
+The result (if successful) will be an executable binary at: `image-metadata-commons-imaging/target/image-metadata-commons-imaging`
+
+TIP: You can use https://upx.github.io/[Ultimate Packer for eXecutables] (UPX) to further compress the binary. E.g.
+`upx -9 image-metadata-commons-imaging/target/image-metadata-commons-imaging`
+
+NOTE: UPX seems to be broken currently on MacOS 13. See the relevant https://github.com/upx/upx/issues/612[GitHub issue ticket]
+for details.
 
 ==== macOS
 
-As the application uses some AWT classes for image processing, the native
-version for macOS will not run. There is an
-https://github.com/oracle/graal/issues/4124[open GitHub issue] at the GraalVM
-project.
+As the application uses some AWT classes for image processing, the native version for macOS will not run using Oracle
+GraalVM. There is an https://github.com/oracle/graal/issues/4124[open GitHub issue] at the GraalVM project.
 
 If you try, you will see an exception like the following:
 
-```
+[source,bash,indent=0,subs=attributes]
+----
 2023-02-12T09:38:34.721-10:00 ERROR 65901 --- [nio-8080-exec-8] o.a.c.c.C.[.[.[/].[dispatcherServlet]    : Servlet.service() for servlet [dispatcherServlet] in context with path [] threw exception [Handler dispatch failed: java.lang.UnsatisfiedLinkError: no awt in java.library.path] with root cause
 
 java.lang.UnsatisfiedLinkError: no awt in java.library.path
 ...
-```
+----
+
+However, compilation will succeed and the application will run when using
+https://bell-sw.com/pages/downloads/native-image-kit/[Liberica Native Image Kit] (NIK).
 
 ==== Windows
 
-On Windows it is critical to compile the project using the
-*x64 Native Tools Command Prompt for VS 2022*. See the following blog posts
-for more information:
+On Windows (With the latest version of GraalVM), things got super-easy, just compile and run:
 
-- https://medium.com/graalvm/using-graalvm-and-native-image-on-windows-10-9954dc071311
-
-Loading the font sub-system reqires you to specify the Java Home directory:
-
-```
-image-metadata-commons-imaging.exe -Djava.home="%JAVA_HOME%"
-```
-
-While this will work, you can reduce the contents of `java.home` to just one file `fontconfig.properties` with the contents:
-
-```properties
-version=1
-sequence.allfonts=default
-```
-
-For more information see:
-
-- https://github.com/adoptium/temurin-build/issues/693
-
-For completeness, the following resource shall be mentioned as well, but it turns out, not all mentioned files are needed:
-
-- https://www.jianshu.com/p/a53ae350f845?v=1669292961020
+[source,bash]
+----
+image-metadata-commons-imaging.exe
+----
 
 ==== Linux
 
-Not tested, yet, but should just work :-) See the instructions for Docker below.
+Once compiled you need to provide the `java.home` to the executable. This is needed to load the font sub-system. However,
+the contents of `java.home` just needs one file `fontconfig.properties` with the contents:
 
-https://github.com/graalvm/mandrel/issues/189
+[source,properties]
+----
+version=1
+sequence.allfonts=default
+----
+
+[NOTE]
+====
+This was previously for the Windows executable as well but seems to work now without. So maybe this may not be needed
+eventually. For more information see:
+
+- https://github.com/adoptium/temurin-build/issues/693
+- https://www.jianshu.com/p/a53ae350f845?v=1669292961020
+====
+
+For simplicity, the project provides a `fontconfig.properties` file. Therefore, once the binary is created, launch the
+application using:
+
+[source,bash]
+----
+./image-metadata-commons-imaging/target/image-metadata-commons-imaging\
+-Djava.home=iage-metadata-commons-imaging/src/lib/
+----
+
+[NOTE]
+====
+You may also need to install `libfreetype6-dev`:
+
+[source,bash]
+----
 apt install gcc zlib1g-dev build-essential libfreetype6-dev
+----
+
+See also: https://github.com/graalvm/mandrel/issues/189
+====
 
 === Docker
 
-_image-metadata-commons-imaging_ uses fonts, which on Linux require `fontconfig`
-to be installed. That's why I use `paketobuildpacks/builder:full` and not the
-default `paketobuildpacks/builder:tiny`.
+NOTE: Not fully tested yet. But should be similar to the Linux steps above.
+
+_image-metadata-commons-imaging_ uses fonts, which on Linux require `fontconfig` to be installed. That's why I use
+`paketobuildpacks/builder:full` and not the default `paketobuildpacks/builder:tiny`.
 
 IMPORTANT: Please make sure your Docker daemon is running.
 
-```bash
+[source,bash,indent=0,subs=attributes]
+----
 ./mvnw -Pnative spring-boot:build-image -pl :image-metadata-commons-imaging
 docker run --rm -p 8080:8080 docker.io/library/image-metadata-commons-imaging:{current-version}
-```
-
-```bash
-./mvnw clean package -Pnative
-```
+----
 
 == Development
 
-When adding functionality, it may be necessary to run the *native-image-agent*:
+When adding functionality, it may be necessary to run the *native-image-agent*. First build the jar with the
+`native` Maven profile:
 
-```bash
-java -Dspring.aot.enabled=true -agentlib:native-image-agent=config-output-dir=./out/ -jar target/image-metadata-commons-imaging-{current-version}.jar
-```
+[source,bash,indent=0,subs=attributes]
+----
+./mvnw clean package -Pnative
+----
+
+[source,bash,indent=0,subs=attributes]
+----
+java -Dspring.aot.enabled=true \
+-agentlib:native-image-agent=config-output-dir=image-metadata-commons-imaging/src/main/resources/META-INF/native-image \
+-jar image-metadata-commons-imaging/target/image-metadata-commons-imaging-{current-version}.jar
+----
 
 == License
 
 Image Metadata is licensed under the link:LICENSE[Apache License] (ASL), Version 2.0.
-=======
-= Image Metadata processing using Java
-
-Examples for processing image metadata using Java
-
-== Requirements
-
-- Java 17
-- For native compilation: 22.3.r19-grl
-
-== Build
-
-```bash
-./mvn clean package
-```
-
-=== Native Image (local OS)
-
-```bash
-./mvnw clean package -Pnative
-```
-
-Windows
-
-x64 Native Tools Command Prompt for VS 2022
-/c/Users/hille/.sdkman/candidates/java/current/bin/java
-
-
-Resources
-
-https://www.jianshu.com/p/a53ae350f845?v=1669292961020
-
-
-Run Agent
-

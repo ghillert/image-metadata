@@ -15,29 +15,32 @@
  */
 package com.hillert.image.metadata;
 
+import com.hillert.image.metadata.config.StorageConfigProperties;
 import com.hillert.image.metadata.service.ImageService;
-import com.hillert.image.metadata.service.StorageProperties;
+import nz.net.ultraq.thymeleaf.layoutdialect.LayoutDialect;
 
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ImportRuntimeHints;
 
 /**
  * Entrypoint into the demo application.
+ *
  * @author Gunnar Hillert
  */
 @SpringBootApplication
-@EnableConfigurationProperties(StorageProperties.class)
+@EnableConfigurationProperties(StorageConfigProperties.class)
 @ImportRuntimeHints(MyRuntimeHints.class)
+@ConfigurationPropertiesScan
 public class MetadataDemoApplication {
 
 	public static void main(String[] args) {
 		SpringApplicationBuilder builder = new SpringApplicationBuilder(MetadataDemoApplication.class);
-		builder.headless(true)
-			.run(args);
+		builder.headless(true).run(args);
 	}
 
 	@Bean
@@ -47,4 +50,10 @@ public class MetadataDemoApplication {
 			imageService.init();
 		};
 	}
+
+	@Bean
+	public LayoutDialect layoutDialect() {
+		return new LayoutDialect();
+	}
+
 }

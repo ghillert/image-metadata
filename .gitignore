@@ -25,3 +25,7 @@ hs_err_pid*
 .idea
 image-metadata-parent.iml
 upload-dir/
+target/
+.DS_Store
+.project
+.settings

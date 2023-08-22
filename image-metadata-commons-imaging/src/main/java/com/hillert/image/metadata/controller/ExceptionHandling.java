@@ -22,11 +22,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.web.servlet.MultipartProperties;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 /**
  * Exception Handler.
+ *
  * @author Gunnar Hillert
  */
 @ControllerAdvice
@@ -41,16 +43,23 @@ public class ExceptionHandling {
 	}
 
 	@ExceptionHandler(ImageProcessingException.class)
-	public String multipartErrorHandler(ImageProcessingException ex,
-										RedirectAttributes redirectAttributes) throws Exception {
+	public String multipartErrorHandler(ImageProcessingException ex, RedirectAttributes redirectAttributes) {
 		redirectAttributes.addFlashAttribute("error", ex.getMessage());
 		LOGGER.error("ImageProcessingException caught!", ex);
 		return "redirect:/";
 	}
 
-	@ExceptionHandler(MultipartException.class)
-	public String multipartErrorHandler(MultipartException ex,
-					RedirectAttributes redirectAttributes) throws Exception {
-		return "redirect:/uploadError";
+	@ExceptionHandler(MaxUploadSizeExceededException.class)
+	public String multipartErrorHandler(MaxUploadSizeExceededException ex, RedirectAttributes redirectAttributes) {
+		redirectAttributes.addFlashAttribute("errorMessage", String.format("File uploads cannot be larger than %sMB.",
+				this.multipartProperties.getMaxFileSize().toMegabytes()));
+		return "redirect:/upload-error";
 	}
+
+	@ExceptionHandler(MultipartException.class)
+	public String multipartErrorHandler(MultipartException ex, RedirectAttributes redirectAttributes) {
+		redirectAttributes.addFlashAttribute("errorMessage", "An unexpected exception occured.");
+		return "redirect:/upload-error";
+	}
+
 }

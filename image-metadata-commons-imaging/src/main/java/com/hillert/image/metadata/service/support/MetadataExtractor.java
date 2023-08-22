@@ -52,6 +52,8 @@ import org.apache.commons.imaging.formats.jpeg.JpegPhotoshopMetadata;
 import org.apache.commons.imaging.formats.tiff.TiffField;
 import org.apache.commons.imaging.formats.tiff.TiffImageMetadata;
 import org.apache.commons.imaging.formats.tiff.constants.GpsTagConstants;
+import org.apache.commons.imaging.formats.tiff.constants.MicrosoftTagConstants;
+import org.apache.commons.imaging.formats.tiff.taginfos.TagInfo;
 import org.apache.xmlgraphics.util.QName;
 import org.apache.xmlgraphics.xmp.XMPParser;
 import org.apache.xmlgraphics.xmp.XMPProperty;
@@ -64,6 +66,7 @@ import org.springframework.util.StringUtils;
 
 /**
  * Utility class for extracting metadata from image data provided by {@link Resource}s.
+ *
  * @author Gunnar Hillert
  */
 public final class MetadataExtractor {
@@ -81,15 +84,20 @@ public final class MetadataExtractor {
 		try {
 			BasicFileAttributes attr = Files.readAttributes(resource.getFile().toPath(), BasicFileAttributes.class);
 			directories.add(new Directory(DirectoryType.FILE, "File Name", resource.getFilename()));
-			directories.add(new Directory(DirectoryType.FILE, "File Size", String.valueOf(CommonUtils.humanReadableByteCountSI(attr.size()))));
-			directories.add(new Directory(DirectoryType.FILE, "File Modification Date/Time", String.valueOf(attr.creationTime())));
-			directories.add(new Directory(DirectoryType.FILE, "File Creation Date/Time", String.valueOf(attr.lastModifiedTime())));
+			directories.add(new Directory(DirectoryType.FILE, "File Size",
+					String.valueOf(CommonUtils.humanReadableByteCountSI(attr.size()))));
+			directories.add(new Directory(DirectoryType.FILE, "File Modification Date/Time",
+					String.valueOf(attr.creationTime())));
+			directories.add(new Directory(DirectoryType.FILE, "File Creation Date/Time",
+					String.valueOf(attr.lastModifiedTime())));
 		}
 		catch (FileNotFoundException ex) {
 			return directories;
 		}
 		catch (IOException ex) {
-			throw new RuntimeException(ex);
+			throw new IllegalStateException(
+					"An I/O error occurred while retrieving the file attributes for file " + resource.getFilename(),
+					ex);
 		}
 		return directories;
 	}
@@ -115,16 +123,19 @@ public final class MetadataExtractor {
 		LOGGER.info(xmpString);
 
 		try {
-			//org.apache.xmlgraphics.xmp.Metadata xmpMetaData = XMPParser.parseXMP(new StreamSource(new StringReader(xmpString)));
+			// org.apache.xmlgraphics.xmp.Metadata xmpMetaData = XMPParser.parseXMP(new
+			// StreamSource(new StringReader(xmpString)));
 
-			org.apache.xmlgraphics.xmp.Metadata xmpMetaData = XMPParser.parseXMP(new StreamSource(new StringReader(xmpString.substring(0, xmpString.lastIndexOf('>') + 1))));
+			org.apache.xmlgraphics.xmp.Metadata xmpMetaData = XMPParser
+				.parseXMP(new StreamSource(new StringReader(xmpString.substring(0, xmpString.lastIndexOf('>') + 1))));
 
-			for (Iterator it = xmpMetaData.iterator(); it.hasNext(); ) {
+			for (Iterator<?> it = xmpMetaData.iterator(); it.hasNext();) {
 				QName key = (QName) it.next();
 				XMPProperty property = xmpMetaData.getProperty(key);
 				final String propertyValue;
 				if (property.isArray()) {
-					propertyValue = (property.getArrayValue().getSimpleValue() != null) ? property.getArrayValue().getSimpleValue().toString() : "N/A";
+					propertyValue = (property.getArrayValue().getSimpleValue() != null)
+							? property.getArrayValue().getSimpleValue().toString() : "N/A";
 				}
 				else {
 					propertyValue = property.getValue().toString();
@@ -134,32 +145,33 @@ public final class MetadataExtractor {
 			LOGGER.info("XMP Property Count: {}", xmpMetaData.getPropertyCount());
 		}
 		catch (TransformerException ex) {
-			throw new IllegalStateException(ex); //TODO
+			throw new IllegalStateException(ex); // TODO
 		}
 		return directories;
 	}
 
-	public static List<Directory> getImageInfo(Resource resource) {
-
-		final List<Directory> directories = new ArrayList<>();
-
+	public static ImageInfo loadImageInfo(byte[] imageBytes) {
 		final ImageInfo imageInfo;
 
 		try {
-			imageInfo = Imaging.getImageInfo(resource.getInputStream(), resource.getFilename());
+			imageInfo = Imaging.getImageInfo(imageBytes);
 		}
-		catch (ImageReadException ex) {
-			throw new RuntimeException(ex);
+		catch (ImageReadException | IOException ex) {
+			throw new IllegalStateException("Unable to read 'image info' of the provided image data.", ex);
 		}
-		catch (IOException ex) {
-			throw new RuntimeException(ex);
-		}
+		return imageInfo;
+	}
+
+	public static List<Directory> getImageInfo(Resource resource) {
+		final ImageInfo imageInfo = MetadataExtractor.loadImageInfo(CommonUtils.resourceToBytes(resource));
+
+		final List<Directory> directories = new ArrayList<>();
 
 		final int bitsPerPixel = imageInfo.getBitsPerPixel();
 		final String comments = StringUtils.collectionToDelimitedString(imageInfo.getComments(), " ");
 		final String colorType = imageInfo.getColorType().name();
 		final int numberOfImages = imageInfo.getNumberOfImages();
-		final String compressionAlgorith = imageInfo.getCompressionAlgorithm().name();
+		final String compressionAlgorithm = imageInfo.getCompressionAlgorithm().name();
 		final String format = imageInfo.getFormat().getName();
 		final String formatDetails = imageInfo.getFormatDetails();
 		final int height = imageInfo.getHeight();
@@ -170,25 +182,26 @@ public final class MetadataExtractor {
 		final float physicalWidthInc = imageInfo.getPhysicalWidthInch();
 		final boolean isProgressive = imageInfo.isProgressive();
 		final String mimeType = imageInfo.getMimeType();
-		final boolean isTransperent = imageInfo.isTransparent();
+		final boolean isTransparent = imageInfo.isTransparent();
 		final boolean usesPalette = imageInfo.usesPalette();
 
 		directories.add(new Directory(DirectoryType.FILE_INFO, "bitsPerPixel", String.valueOf(bitsPerPixel)));
 		directories.add(new Directory(DirectoryType.FILE_INFO, "comments", comments));
 		directories.add(new Directory(DirectoryType.FILE_INFO, "colorType", colorType));
 		directories.add(new Directory(DirectoryType.FILE_INFO, "numberOfImages", String.valueOf(numberOfImages)));
-		directories.add(new Directory(DirectoryType.FILE_INFO, "compressionAlgorith", compressionAlgorith));
+		directories.add(new Directory(DirectoryType.FILE_INFO, "compressionAlgorithm", compressionAlgorithm));
 		directories.add(new Directory(DirectoryType.FILE_INFO, "format", format));
 		directories.add(new Directory(DirectoryType.FILE_INFO, "formatDetails", formatDetails));
 		directories.add(new Directory(DirectoryType.FILE_INFO, "height", String.valueOf(height)));
 		directories.add(new Directory(DirectoryType.FILE_INFO, "width", String.valueOf(width)));
 		directories.add(new Directory(DirectoryType.FILE_INFO, "physicalHeightDpi", String.valueOf(physicalHeightDpi)));
-		directories.add(new Directory(DirectoryType.FILE_INFO, "physicalHeightInch", String.valueOf(physicalHeightInch)));
+		directories
+			.add(new Directory(DirectoryType.FILE_INFO, "physicalHeightInch", String.valueOf(physicalHeightInch)));
 		directories.add(new Directory(DirectoryType.FILE_INFO, "physicalWidthDpi", String.valueOf(physicalWidthDpi)));
 		directories.add(new Directory(DirectoryType.FILE_INFO, "physicalWidthInc", String.valueOf(physicalWidthInc)));
 		directories.add(new Directory(DirectoryType.FILE_INFO, "isProgressive", String.valueOf(isProgressive)));
 		directories.add(new Directory(DirectoryType.FILE_INFO, "mimeType", mimeType));
-		directories.add(new Directory(DirectoryType.FILE_INFO, "isTransperent", String.valueOf(isTransperent)));
+		directories.add(new Directory(DirectoryType.FILE_INFO, "isTransparent", String.valueOf(isTransparent)));
 		directories.add(new Directory(DirectoryType.FILE_INFO, "usesPalette", String.valueOf(usesPalette)));
 
 		return directories;
@@ -199,22 +212,19 @@ public final class MetadataExtractor {
 		try {
 			metadata = Imaging.getMetadata(resource.getInputStream(), resource.getFilename());
 		}
-		catch (ImageReadException ex) {
-			throw new RuntimeException(ex);
-		}
-		catch (IOException ex) {
-			throw new RuntimeException(ex);
+		catch (ImageReadException | IOException ex) {
+			throw new IllegalStateException("Unable to parse the metadata of image file " + resource.getFilename(), ex);
 		}
 		return metadata;
 	}
 
-	private static DateTimeFormatter GPS_LOCAL_DATE = new DateTimeFormatterBuilder()
-				.appendValue(ChronoField.YEAR, 4, 10, SignStyle.EXCEEDS_PAD)
-				.appendLiteral(':')
-				.appendValue(ChronoField.MONTH_OF_YEAR, 2)
-				.appendLiteral(':')
-				.appendValue(ChronoField.DAY_OF_MONTH, 2)
-				.toFormatter(Locale.US);
+	private static final DateTimeFormatter GPS_LOCAL_DATE = new DateTimeFormatterBuilder()
+		.appendValue(ChronoField.YEAR, 4, 10, SignStyle.EXCEEDS_PAD)
+		.appendLiteral(':')
+		.appendValue(ChronoField.MONTH_OF_YEAR, 2)
+		.appendLiteral(':')
+		.appendValue(ChronoField.DAY_OF_MONTH, 2)
+		.toFormatter(Locale.US);
 
 	public static List<Directory> getJpegImageMetadata(JpegImageMetadata jpegImageMetadata) {
 		final List<Directory> directories = new ArrayList<>();
@@ -223,33 +233,42 @@ public final class MetadataExtractor {
 			return directories;
 		}
 
-		TiffImageMetadata exifMetadata = jpegImageMetadata.getExif();
+		final TiffImageMetadata exifMetadata = jpegImageMetadata.getExif();
 
 		if (exifMetadata != null) {
-			final List<TiffImageMetadata.TiffMetadataItem> exifMetadataItems = (List<TiffImageMetadata.TiffMetadataItem>) exifMetadata.getItems();
+			@SuppressWarnings("unchecked")
+			final List<TiffImageMetadata.TiffMetadataItem> exifMetadataItems = (List<TiffImageMetadata.TiffMetadataItem>) exifMetadata
+				.getItems();
 
 			for (TiffImageMetadata.TiffMetadataItem tiffMetadataItem : exifMetadataItems) {
-				String value = StringUtils.hasText(tiffMetadataItem.getText()) ? tiffMetadataItem.getText() : "N/A";
-				LOGGER.info(">>> : " + tiffMetadataItem.getTiffField() + " : " + value); //TODO
-				directories.add(new Directory(DirectoryType.EXIF, tiffMetadataItem.getKeyword(), value));
+				final String propertyName = tiffMetadataItem.getKeyword();
+				final String propertyValue = StringUtils.hasText(tiffMetadataItem.getText())
+						? tiffMetadataItem.getText() : "N/A";
+				LOGGER.debug("Exif Property '{}': {}.", propertyName, propertyValue);
+				directories.add(new Directory(DirectoryType.EXIF, propertyName, propertyValue));
+
+				for (TagInfo tagInfo : MicrosoftTagConstants.ALL_MICROSOFT_TAGS) {
+					if (tagInfo.equals(tiffMetadataItem.getTiffField().getTagInfo())) {
+						directories.add(new Directory(DirectoryType.WINDOWS, propertyName, propertyValue));
+					}
+				}
 			}
 		}
 
-//		GenericImageMetadata.GenericImageMetadataItem genericImageMetadataItem = new GenericImageMetadata.GenericImageMetadataItem();
-//		jpegPhotoshopMetadata.add();
-
-//		for (ImageMetadata.ImageMetadataItem imageMetadataItem : jpegMetadata.getItems()) {
-		JpegPhotoshopMetadata jpegPhotoshopMetadata = jpegImageMetadata.getPhotoshop();
+		final JpegPhotoshopMetadata jpegPhotoshopMetadata = jpegImageMetadata.getPhotoshop();
 
 		if (jpegPhotoshopMetadata != null) {
 			for (ImageMetadata.ImageMetadataItem imageMetadataItem : jpegPhotoshopMetadata.getItems()) {
-				if (imageMetadataItem instanceof GenericImageMetadata.GenericImageMetadataItem) {
-					GenericImageMetadata.GenericImageMetadataItem genericItem = (GenericImageMetadata.GenericImageMetadataItem) imageMetadataItem;
-					LOGGER.info(genericItem.getKeyword() + " : " + genericItem.getText()); //TODO
-					directories.add(new Directory(DirectoryType.IPTC, genericItem.getKeyword(), genericItem.getText()));
+				if (imageMetadataItem instanceof GenericImageMetadata.GenericImageMetadataItem genericItem) {
+					final String propertyName = genericItem.getKeyword();
+					final String propertyValue = StringUtils.hasText(genericItem.getText()) ? genericItem.getText()
+							: "N/A";
+					LOGGER.debug("IPTC Property '{}': {}.", propertyName, propertyValue);
+					directories.add(new Directory(DirectoryType.IPTC, propertyName, propertyValue));
 				}
 				else {
-					System.out.println(imageMetadataItem.getClass().getSimpleName()); //TODO
+					throw new IllegalStateException(
+							"Unhandled ImageMetadataItem: " + imageMetadataItem.getClass().getSimpleName());
 				}
 			}
 		}
@@ -298,20 +317,35 @@ public final class MetadataExtractor {
 			final TiffField timestampField = exifMetadata.findField(GpsTagConstants.GPS_TAG_GPS_TIME_STAMP);
 			final RationalNumber[] timestamp = (RationalNumber[]) timestampField.getValue();
 			Assert.isTrue(timestamp.length == 3, "The timestamp should have a length of 3 but was " + timestamp.length);
-			final LocalTime localTime = LocalTime.of(timestamp[0].intValue(), timestamp[1].intValue(), timestamp[2].intValue());
+			final LocalTime localTime = LocalTime.of(timestamp[0].intValue(), timestamp[1].intValue(),
+					timestamp[2].intValue());
 
 			final LocalDateTime localDateTime = LocalDateTime.of(localDate, localTime);
 			ZonedDateTime zonedDateTime = ZonedDateTime.of(localDateTime, ZoneOffset.UTC);
 
-			final GnssInfo gnssInfo = new GnssInfo(gpsInfo.getLatitudeAsDegreesNorth(), gpsInfo.getLongitudeAsDegreesEast());
+			final GnssInfo gnssInfo = new GnssInfo(gpsInfo.getLatitudeAsDegreesNorth(),
+					gpsInfo.getLongitudeAsDegreesEast());
 			final TiffField elevationField = exifMetadata.findField(GpsTagConstants.GPS_TAG_GPS_ALTITUDE);
 			gnssInfo.setElevation(elevationField.getDoubleValue());
 			gnssInfo.setGnssTime(zonedDateTime);
 			return gnssInfo;
-
 		}
 		catch (ImageReadException ex) {
-			throw new RuntimeException(ex);
+			throw new IllegalStateException("Unable to retrieve a Metadata value.", ex);
 		}
 	}
+
+	public static List<Directory> getGenericImageMetadata(GenericImageMetadata genericImageMetadata) {
+		Assert.notNull(genericImageMetadata, "genericImageMetadata must not be null.");
+		return genericImageMetadata.getItems().stream().map((p) -> {
+			if (p instanceof GenericImageMetadata.GenericImageMetadataItem x) {
+				final Directory directory = new Directory(DirectoryType.GENERIC, x.getKeyword(), x.getText());
+				return directory;
+			}
+			else {
+				throw new ImageProcessingException("Unsupported implementation of ImageMetadataItem");
+			}
+		}).toList();
+	}
+
 }

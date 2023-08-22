@@ -15,32 +15,29 @@
  */
 package com.hillert.image.metadata.service;
 
-import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.stream.StreamSource;
 
 import com.hillert.image.metadata.model.DirectoryType;
 import com.hillert.image.metadata.model.GnssInfo;
 import com.hillert.image.metadata.model.Metadata;
+import com.hillert.image.metadata.service.support.CommonUtils;
 import com.hillert.image.metadata.service.support.ImageProcessingException;
 import com.hillert.image.metadata.service.support.MetadataExtractor;
 import org.apache.commons.imaging.ImageReadException;
 import org.apache.commons.imaging.ImageWriteException;
 import org.apache.commons.imaging.Imaging;
+import org.apache.commons.imaging.common.GenericImageMetadata;
 import org.apache.commons.imaging.common.ImageMetadata;
 import org.apache.commons.imaging.formats.gif.GifImageMetadata;
 import org.apache.commons.imaging.formats.jpeg.JpegImageMetadata;
@@ -57,20 +54,22 @@ import org.apache.commons.imaging.formats.tiff.constants.MicrosoftTagConstants;
 import org.apache.commons.imaging.formats.tiff.constants.TiffTagConstants;
 import org.apache.commons.imaging.formats.tiff.write.TiffOutputDirectory;
 import org.apache.commons.imaging.formats.tiff.write.TiffOutputSet;
-import org.apache.commons.io.IOUtils;
-import org.apache.xml.serialize.OutputFormat;
-import org.apache.xml.serialize.XMLSerializer;
+import org.apache.xmlgraphics.xmp.XMPParser;
+import org.apache.xmlgraphics.xmp.XMPSerializer;
+import org.apache.xmlgraphics.xmp.schemas.DublinCoreAdapter;
+import org.apache.xmlgraphics.xmp.schemas.DublinCoreSchema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StreamUtils;
+import org.springframework.util.StringUtils;
 
 /**
  * Default implementation of the {@link MetadataService} interface.
+ *
  * @author Gunnar Hillert
  */
 @Service
@@ -80,7 +79,7 @@ public class DefaultMetadataService implements MetadataService {
 
 	@Override
 	public Metadata getExifData(Resource resource) {
-		Metadata metadataToReturn = new Metadata();
+		final Metadata metadataToReturn = new Metadata();
 
 		metadataToReturn.addDirectories(MetadataExtractor.getFileMetadata(resource));
 		metadataToReturn.addDirectories(MetadataExtractor.getXMPMetadata(resource));
@@ -94,8 +93,11 @@ public class DefaultMetadataService implements MetadataService {
 
 		if (metadata instanceof JpegImageMetadata jpegImageMetadata) {
 			metadataToReturn.addDirectories(MetadataExtractor.getJpegImageMetadata(jpegImageMetadata));
-			GnssInfo gnssInfo = MetadataExtractor.getGnssMetadata(jpegImageMetadata);
+			final GnssInfo gnssInfo = MetadataExtractor.getGnssMetadata(jpegImageMetadata);
 			metadataToReturn.setGnssInfo(gnssInfo);
+		}
+		else if (metadata instanceof GenericImageMetadata genericImageMetadata) {
+			metadataToReturn.addDirectories(MetadataExtractor.getGenericImageMetadata(genericImageMetadata));
 		}
 		else if (metadata instanceof GifImageMetadata gifImageMetadata) {
 			metadataToReturn.addDirectories(MetadataExtractor.getGifImageMetadata(gifImageMetadata));
@@ -106,132 +108,268 @@ public class DefaultMetadataService implements MetadataService {
 
 		final String xmpXmlData;
 		try {
-			xmpXmlData = this.getXmpXml(getBytes(resource.getInputStream()));
+			xmpXmlData = this.getXmpXml(StreamUtils.copyToByteArray(resource.getInputStream()));
 		}
-		catch (IOException ex) { //TODO
+		catch (IOException ex) {
 			throw new ImageProcessingException("Unable to get Inputstream from resource " + resource.getFilename(), ex);
 		}
-		metadataToReturn.setXmpData(xmpXmlData);
+		if (xmpXmlData != null) {
+			metadataToReturn.setXmpData(xmpXmlData);
+		}
 		return metadataToReturn;
 	}
 
-	//TODO try apache commons io
-	private static byte[] getBytes(InputStream is) throws IOException {
-		byte[] buffer = new byte[8192];
-		ByteArrayOutputStream baos = new ByteArrayOutputStream(2048);
-		int n;
-		baos.reset();
-
-		while ((n = is.read(buffer, 0, buffer.length)) != -1) {
-			baos.write(buffer, 0, n);
-		}
-
-		return baos.toByteArray();
-	}
-
 	/**
-	 * May also consider https://issues.apache.org/jira/browse/IMAGING-132.
+	 * This method will purge the image metadata for the provided metadataType. The
+	 * following 3 types are supported:
+	 * <ul>
+	 * <li>{@link DirectoryType#EXIF}
+	 * <li>{@link DirectoryType#IPTC}
+	 * <li>{@link DirectoryType#XMP}
+	 * </ul>
+	 * See also consider https://issues.apache.org/jira/browse/IMAGING-132.
 	 * @param imageBytes the image data to purge metadata from
 	 * @param metadataType which type of metadata to purge
-	 * @return the modified image data
+	 * @return the modified image data #throws ImageProcessingException in case an
+	 * unsupported {@link DirectoryType} is proided
 	 */
 	@Override
 	public byte[] purge(byte[] imageBytes, DirectoryType metadataType) {
 
 		LOGGER.info("Remove metadata for metadataType {}", metadataType.getName());
 
-		ByteArrayOutputStream os = null;
-		boolean canThrow = false;
-		try {
-			os = new ByteArrayOutputStream();
+		final byte[] purgedImageData;
 
+		try (ByteArrayOutputStream os = new ByteArrayOutputStream();) {
 			switch (metadataType) {
 				case EXIF -> new ExifRewriter().removeExifMetadata(imageBytes, os);
 				case IPTC -> new JpegIptcRewriter().removeIPTC(imageBytes, os);
 				case XMP -> new JpegXmpRewriter().removeXmpXml(imageBytes, os);
-				default -> throw new ImageProcessingException("Unsupported DirectoryType " + metadataType.getName(), null);
+				default ->
+					throw new ImageProcessingException("Unsupported DirectoryType " + metadataType.getName(), null);
 			}
+			purgedImageData = os.toByteArray();
 		}
 		catch (ImageWriteException | IOException | ImageReadException ex) {
 			throw new ImageProcessingException("Unable to purge Image metadata for " + metadataType.getName(), ex);
 		}
-		finally {
-			IOUtils.closeQuietly(os);
-		}
-		return os.toByteArray();
+		return purgedImageData;
 	}
 
-	public static boolean updateWindowsFields(final File jpegImageFile, final File dst)
-			throws IOException, ImageReadException, ImageWriteException {
+	@Override
+	public byte[] updateMetadata(byte[] imageBytes, boolean populateWindowsTags, String referenceId, String title) {
 
-		try (FileOutputStream fos = new FileOutputStream(dst);
-			OutputStream os = new BufferedOutputStream(fos)) {
-			TiffOutputSet outputSet = null;
-			final ImageMetadata metadata = Imaging.getMetadata(jpegImageFile);
-			final JpegImageMetadata jpegMetadata = (JpegImageMetadata) metadata;
-			if (null != jpegMetadata) {
+		LOGGER.info("populateWindowsTags: {}; referenceId: {}; title: {}", populateWindowsTags, referenceId, title);
 
-				final JpegPhotoshopMetadata jpegPhotoshopMetadata = jpegMetadata.getPhotoshop();
-				final List<IptcBlock> newBlocks = jpegPhotoshopMetadata.photoshopApp13Data.getNonIptcBlocks();
+		final HashMap<String, String> exifTagsToPopulate = new HashMap<>();
+		final HashMap<String, String> iptcTagsToPopulate = new HashMap<>();
+		final HashMap<String, String> xmpTagsToPopulate = new HashMap<>();
 
-				final List<IptcRecord> newRecords = new ArrayList<>();
-				newRecords.add(new IptcRecord(IptcTypes.CITY, "Albany, NY"));
-				newRecords.add(new IptcRecord(IptcTypes.CREDIT,
-						"William Sorensen"));
-				newRecords.add(new IptcRecord(IptcTypes.ORIGINAL_TRANSMISSION_REFERENCE,
-						"ACESSION ID 1234"));
-				newRecords.add(new IptcRecord(IptcTypes.SPECIAL_INSTRUCTIONS,
-						"Pembana"));
-				final PhotoshopApp13Data newData = new PhotoshopApp13Data(newRecords,
-						newBlocks);
-//				final File updated = writeIptc(byteSource, newData, imageFile);
-//						new JpegIptcRewriter().writeIPTC();
-				new JpegIptcRewriter().writeIPTC(jpegImageFile, os,
-						newData);
+		if (StringUtils.hasText(referenceId)) {
+			iptcTagsToPopulate.put("referenceId", referenceId);
+			xmpTagsToPopulate.put("referenceId", referenceId);
+		}
 
-//				new JpegImageParser().getXmpXml()
-//				new JpegXmpParser().parseXmpJpegSegment()
-//				new JpegXmpRewriter().updateXmpXml();
+		if (StringUtils.hasText(title)) {
+			exifTagsToPopulate.put("imageDescription", title);
+			iptcTagsToPopulate.put("objectName", title);
+			xmpTagsToPopulate.put("title", title);
 
-				// note that exif might be null if no Exif metadata is found.
+			if (populateWindowsTags) {
+				exifTagsToPopulate.put("xptitle", title);
+			}
+		}
+
+		byte[] resultImageBytes = populateExifTags(imageBytes, exifTagsToPopulate);
+		resultImageBytes = populateIptcTags(resultImageBytes, iptcTagsToPopulate);
+		resultImageBytes = populateXmpTags(resultImageBytes, xmpTagsToPopulate);
+
+		return resultImageBytes;
+	}
+
+	private byte[] populateExifTags(byte[] imageBytes, HashMap<String, String> exifTagsToPopulate) {
+		LOGGER.info("Populating EXIF Tags.");
+
+		final TiffOutputSet outputSet;
+
+		try {
+			ImageMetadata metadata = Imaging.getMetadata(imageBytes);
+
+			// if file does not contain any exif metadata, we create an empty
+			// set of exif metadata. Otherwise, we keep all of the other
+			// existing tags.
+			if (metadata == null) {
+				outputSet = new TiffOutputSet();
+			}
+			else if (metadata instanceof JpegImageMetadata jpegMetadata) {
 				final TiffImageMetadata exif = jpegMetadata.getExif();
 				if (null != exif) {
 					outputSet = exif.getOutputSet();
 				}
+				else {
+					outputSet = new TiffOutputSet();
+				}
 			}
-			// if file does not contain any exif metadata, we create an empty
-			// set of exif metadata. Otherwise, we keep all of the other
-			// existing tags.
-			if (null == outputSet) {
+			else {
+				LOGGER.warn("Ignoring ImageMetadata {}.", metadata.getClass().getSimpleName());
 				outputSet = new TiffOutputSet();
 			}
-
-			final TiffOutputDirectory rootDir = outputSet.getOrCreateRootDirectory();
-			rootDir.removeField(TiffTagConstants.TIFF_TAG_IMAGE_DESCRIPTION);
-			rootDir.add(TiffTagConstants.TIFF_TAG_IMAGE_DESCRIPTION, "shit happens");
-
-			rootDir.removeField(MicrosoftTagConstants.EXIF_TAG_XPTITLE);
-			rootDir.add(MicrosoftTagConstants.EXIF_TAG_XPTITLE, "new title");
-
-			rootDir.removeField(MicrosoftTagConstants.EXIF_TAG_XPSUBJECT);
-			rootDir.add(MicrosoftTagConstants.EXIF_TAG_XPSUBJECT, "new subject");
-			//
-			rootDir.removeField(MicrosoftTagConstants.EXIF_TAG_XPCOMMENT);
-			rootDir.add(MicrosoftTagConstants.EXIF_TAG_XPCOMMENT, "new comment");
-			//
-			rootDir.removeField(MicrosoftTagConstants.EXIF_TAG_XPKEYWORDS);
-			rootDir.add(MicrosoftTagConstants.EXIF_TAG_XPKEYWORDS, "key1;key2");
-			//
-			rootDir.removeField(MicrosoftTagConstants.EXIF_TAG_RATING);
-			rootDir.add(MicrosoftTagConstants.EXIF_TAG_RATING, (short) 4);
-
-			new ExifRewriter().updateExifMetadataLossless(jpegImageFile, os,
-					outputSet);
-			return true;
 		}
-		catch (Exception ex) {
-			return false;
+		catch (IOException | ImageReadException ex) {
+			throw new ImageProcessingException("Unable to get Image Metadata.", ex);
 		}
+		catch (ImageWriteException ex) {
+			throw new ImageProcessingException("Unable to get EXIF Tags.", ex);
+		}
+
+		final byte[] modifiedImageData;
+
+		try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
+			for (Map.Entry<String, String> tag : exifTagsToPopulate.entrySet()) {
+				if ("imageDescription".equalsIgnoreCase(tag.getKey())) {
+					final TiffOutputDirectory rootDir = outputSet.getOrCreateRootDirectory();
+					rootDir.removeField(TiffTagConstants.TIFF_TAG_IMAGE_DESCRIPTION);
+					rootDir.add(TiffTagConstants.TIFF_TAG_IMAGE_DESCRIPTION, tag.getValue());
+				}
+
+				if ("xptitle".equalsIgnoreCase(tag.getKey())) {
+					final TiffOutputDirectory rootDir = outputSet.getOrCreateRootDirectory();
+					rootDir.removeField(MicrosoftTagConstants.EXIF_TAG_XPTITLE);
+					rootDir.add(MicrosoftTagConstants.EXIF_TAG_XPTITLE, tag.getValue());
+				}
+			}
+
+			// TODO
+			// rootDir.removeField(MicrosoftTagConstants.EXIF_TAG_XPSUBJECT);
+			// rootDir.add(MicrosoftTagConstants.EXIF_TAG_XPSUBJECT, "new subject");
+			//
+			// rootDir.removeField(MicrosoftTagConstants.EXIF_TAG_XPCOMMENT);
+			// rootDir.add(MicrosoftTagConstants.EXIF_TAG_XPCOMMENT, "new comment");
+			//
+			// rootDir.removeField(MicrosoftTagConstants.EXIF_TAG_XPKEYWORDS);
+			// rootDir.add(MicrosoftTagConstants.EXIF_TAG_XPKEYWORDS, "key1;key2");
+			//
+			// rootDir.removeField(MicrosoftTagConstants.EXIF_TAG_RATING);
+			// rootDir.add(MicrosoftTagConstants.EXIF_TAG_RATING, (short) 4);
+
+			new ExifRewriter().updateExifMetadataLossless(imageBytes, os, outputSet);
+			modifiedImageData = os.toByteArray();
+		}
+		catch (ImageWriteException | IOException | ImageReadException ex) {
+			throw new ImageProcessingException("Unable to populate Windows-specific EXIF Tags.", ex);
+		}
+		return modifiedImageData;
+	}
+
+	private byte[] populateIptcTags(byte[] imageBytes, HashMap<String, String> iptcTagsToPopulate) {
+		LOGGER.info("Populating {} IPTC Tags.", iptcTagsToPopulate.size());
+
+		if (iptcTagsToPopulate.isEmpty()) {
+			return imageBytes;
+		}
+
+		final List<IptcBlock> newBlocks;
+		final List<IptcRecord> newRecords;
+
+		try {
+			final ImageMetadata metadata = Imaging.getMetadata(imageBytes);
+			if (metadata == null) {
+				newBlocks = new ArrayList<>();
+				newRecords = new ArrayList<>();
+			}
+			else {
+				final JpegImageMetadata jpegMetadata = (JpegImageMetadata) metadata;
+				final JpegPhotoshopMetadata jpegPhotoshopMetadata = jpegMetadata.getPhotoshop();
+				if (jpegPhotoshopMetadata != null) {
+					newRecords = jpegPhotoshopMetadata.photoshopApp13Data.getRecords();
+					newBlocks = jpegPhotoshopMetadata.photoshopApp13Data.getNonIptcBlocks();
+				}
+				else {
+					newBlocks = new ArrayList<>();
+					newRecords = new ArrayList<>();
+				}
+			}
+		}
+		catch (IOException | ImageReadException ex) {
+			throw new ImageProcessingException("Unable to get Image Metadata.", ex);
+		}
+
+		final byte[] modifiedImageData;
+
+		try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
+			for (Map.Entry<String, String> tag : iptcTagsToPopulate.entrySet()) {
+				if ("referenceId".equalsIgnoreCase(tag.getKey())) {
+					newRecords
+						.removeIf((p) -> p.iptcType.getType() == IptcTypes.ORIGINAL_TRANSMISSION_REFERENCE.getType());
+					newRecords.add(new IptcRecord(IptcTypes.ORIGINAL_TRANSMISSION_REFERENCE, tag.getValue()));
+				}
+				else if ("objectName".equalsIgnoreCase(tag.getKey())) {
+					newRecords
+						.removeIf((p) -> p.iptcType.getType() == IptcTypes.OBJECT_NAME.getType());
+					newRecords.add(new IptcRecord(IptcTypes.OBJECT_NAME, tag.getValue()));
+				}
+			}
+			final PhotoshopApp13Data newData = new PhotoshopApp13Data(newRecords, newBlocks);
+			new JpegIptcRewriter().writeIPTC(imageBytes, os, newData);
+			modifiedImageData = os.toByteArray();
+		}
+		catch (ImageWriteException | IOException | ImageReadException ex) {
+			throw new ImageProcessingException("Unable to populate reference id.", ex);
+		}
+		return modifiedImageData;
+	}
+
+	private byte[] populateXmpTags(byte[] imageBytes, HashMap<String, String> xmpTagsToPopulate) {
+
+		if (xmpTagsToPopulate.isEmpty()) {
+			return imageBytes;
+		}
+
+		final String xmpXml = getXmpXml(imageBytes);
+		final org.apache.xmlgraphics.xmp.Metadata xmpMetaData;
+
+		if (xmpXml == null) {
+			xmpMetaData = new org.apache.xmlgraphics.xmp.Metadata();
+		}
+		else {
+			final ByteArrayInputStream input = new ByteArrayInputStream(xmpXml.getBytes(StandardCharsets.UTF_8));
+			try {
+				xmpMetaData = XMPParser.parseXMP(new StreamSource(input));
+			}
+			catch (TransformerException ex) {
+				throw new ImageProcessingException("Unable to parse XMP data.", ex);
+			}
+		}
+		final DublinCoreAdapter dc = DublinCoreSchema.getAdapter(xmpMetaData);
+
+		for (Map.Entry<String, String> entry : xmpTagsToPopulate.entrySet()) {
+			if ("referenceId".equalsIgnoreCase(entry.getKey())) {
+				dc.setIdentifier(entry.getValue());
+			}
+			if ("title".equalsIgnoreCase(entry.getKey())) {
+				dc.setTitle(entry.getValue());
+			}
+		}
+
+		final String xmpAsString;
+
+		try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
+			XMPSerializer.writeXMPPacket(xmpMetaData, bos, false);
+			xmpAsString = bos.toString(StandardCharsets.UTF_8);
+		}
+		catch (TransformerConfigurationException | SAXException | IOException ex) {
+			throw new ImageProcessingException("Unable to write XMP data.", ex);
+		}
+
+		final byte[] modifiedImageData;
+		try (ByteArrayOutputStream modifiedImageDataOutputStream = new ByteArrayOutputStream()) {
+			new JpegXmpRewriter().updateXmpXml(imageBytes, modifiedImageDataOutputStream, xmpAsString);
+			modifiedImageData = modifiedImageDataOutputStream.toByteArray();
+		}
+		catch (ImageReadException | IOException | ImageWriteException ex) {
+			throw new ImageProcessingException("Unable to write XMP data to JPG.", ex);
+		}
+		return modifiedImageData;
 	}
 
 	private String getXmpXml(byte[] imageBytes) {
@@ -240,73 +378,16 @@ public class DefaultMetadataService implements MetadataService {
 			xmpString = Imaging.getXmpXml(imageBytes);
 		}
 		catch (ImageReadException ex) {
-			throw new ImageProcessingException("Unabled to parse the image.", ex);
+			throw new ImageProcessingException("Unable to parse the image.", ex);
 		}
 		catch (IOException ex) {
 			throw new ImageProcessingException("Unable to read the image data.", ex);
 		}
+		if (xmpString == null) {
+			return null;
+		}
 
-		ByteArrayInputStream input = new ByteArrayInputStream(imageBytes);
-
-//		System.out.println(xmpString);
-//		try {
-//			org.apache.xmlgraphics.xmp.Metadata xmpMetaData = XMPParser.parseXMP(new StreamSource(input));
-//		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-//		XMPSerializer.writeXMPPacket(xmpMetaData, bos, false );
-//		} catch (TransformerException | SAXException e) {
-//			throw new RuntimeException(e);
-//		}
-//		DublinCoreAdapter dc = DublinCoreSchema.getAdapter(xmpMetaData);
-//		dc.setTitle("Shit happens!!!!");
-//
-//		XMPBasicAdapter basic = XMPBasicSchema.getAdapter(xmpMetaData);
-//
-//		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-//		XMPSerializer.writeXMPPacket(xmpMetaData, bos, false );
-//
-//		String f = new String( bos.toByteArray() );
-//		System.out.println(f);
-//		new JpegXmpRewriter().updateXmpXml(new File("/Users/hillert/dev/temp/123.jpg"), new FileOutputStream("/Users/hillert/dev/temp/123-eeee.jpg"), f);
-		System.out.println("-----------");
-		System.out.println(xmpString);
-		System.out.println("-----------");
-		System.out.println(format(xmpString, false));
-		System.out.println("-----------");
-		return format(xmpString, false);
+		return CommonUtils.formatXml(xmpString, false);
 	}
 
-	public static String format(String xml, Boolean ommitXmlDeclaration) {
-		DocumentBuilder db = null;
-		try {
-			db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-		}
-		catch (ParserConfigurationException ex) {
-			throw new RuntimeException(ex);
-		}
-		Document doc = null;
-		try {
-			doc = db.parse(new InputSource(new StringReader(xml.trim())));
-		}
-		catch (SAXException ex) {
-			throw new RuntimeException(ex);
-		}
-		catch (IOException ex) {
-			throw new RuntimeException(ex);
-		}
-
-		OutputFormat format = new OutputFormat(doc);
-		format.setIndenting(true);
-		format.setIndent(2);
-		format.setOmitXMLDeclaration(ommitXmlDeclaration);
-		format.setLineWidth(Integer.MAX_VALUE);
-		Writer outxml = new StringWriter();
-		XMLSerializer serializer = new XMLSerializer(outxml, format);
-		try {
-			serializer.serialize(doc);
-		}
-		catch (IOException ex) {
-			throw new RuntimeException(ex);
-		}
-		return outxml.toString();
-	}
 }

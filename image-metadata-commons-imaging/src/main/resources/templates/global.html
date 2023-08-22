@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<!--/*  Each token will be replaced by their respective titles in the resulting page. */-->
+	<title layout:title-pattern="$LAYOUT_TITLE - $CONTENT_TITLE">Image Metadata Demo</title>
+
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="Upload images and display image metaddata.">
+	<meta name="author" content="Gunnar Hillert">
+	<meta name="generator" content="Spring Boot 3">
+
+	<link rel="canonical" href="https://getbootstrap.com/docs/5.3/examples/starter-template/">
+	<link href="/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+
+	<!-- Favicons -->
+	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+	<link rel="manifest" href="/site.webmanifest">
+	<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+	<link rel="icon" href="/favicon.ico">
+	<meta name="msapplication-TileColor" content="#da532c">
+	<meta name="theme-color" content="#ffffff">
+
+	<style>
+
+		body {
+			background-color: black;
+		}
+
+		.app-container {
+			border-top: rgb(255,98,51) solid 0.3rem;
+			background-color: white;
+			margin-top: 1rem;
+		}
+
+		.bd-placeholder-img {
+			font-size: 1.125rem;
+			text-anchor: middle;
+			-webkit-user-select: none;
+			-moz-user-select: none;
+			user-select: none;
+		}
+
+		@media (min-width: 768px) {
+			.bd-placeholder-img-lg {
+				font-size: 3.5rem;
+			}
+		}
+
+		.bi {
+			vertical-align: -.125em;
+			fill: currentColor;
+		}
+
+		.nav-scroller {
+			position: relative;
+			z-index: 2;
+			height: 2.75rem;
+			overflow-y: hidden;
+		}
+
+		.nav-scroller .nav {
+			display: flex;
+			flex-wrap: nowrap;
+			padding-bottom: 1rem;
+			margin-top: -1px;
+			overflow-x: auto;
+			text-align: center;
+			white-space: nowrap;
+			-webkit-overflow-scrolling: touch;
+		}
+	</style>
+</head>
+<body>
+<!--/* Standard layout can be mixed with Layout Dialect */-->
+<div class="app-container col-lg-8 mx-auto p-4 py-md-3">
+	<header class="d-flex align-items-center pb-3 mb-5 border-bottom">
+		<a href="/" class="d-flex align-items-center text-dark text-decoration-none">
+			<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="me-2 bi bi-image" viewBox="0 0 16 16">
+				<path id="Sun" d="M6.002,5.5C6.002,6.323 5.325,7 4.502,7C3.679,7 3.002,6.323 3.002,5.5C3.002,4.677 3.679,4 4.502,4C5.325,4 6.002,4.677 6.002,5.5Z" style="fill:rgb(255,98,51);fill-rule:nonzero;"/>
+				<path id="Frame" d="M16.002,13C16.002,14.097 15.099,15 14.002,15L2.002,15C0.905,15 0.002,14.097 0.002,13L0.002,3C0.002,1.903 0.905,1 2.002,1L14.002,1C15.099,1 16.002,1.903 16.002,3L16.002,13ZM15.002,3C15.002,2.451 14.551,2 14.002,2L2.002,2C1.453,2 1.002,2.451 1.002,3L1.002,13.006C1.006,13.552 1.456,14 2.002,14L14.002,14C14.551,14 15.002,13.549 15.002,13L15.002,3Z" style="fill-rule:nonzero;"/>
+				<path id="Mountain" d="M15.002,9.5L15.002,13C15.002,13.549 14.551,14 14.002,14L2.002,14C1.456,14 1.006,13.552 1.002,13.006L1.002,12L3.648,9.646C3.816,9.479 4.081,9.453 4.278,9.584L6.938,11.356L10.648,7.646C10.8,7.495 11.033,7.457 11.225,7.553L15.002,9.5ZM1.002,12L1.002,12L1.002,12Z" style="fill:rgb(136,160,0);fill-rule:nonzero;"/>
+			</svg>
+			<span class="fs-4">Image Metadata Demo</span>
+		</a>
+	</header>
+	<main layout:fragment="content">
+		Contents goes here
+	</main>
+	<footer class="pt-2 text-muted border-top">
+		Artisanally crafted in Hawai‘i by Gunnar Hillert &middot; &copy; 2023
+	</footer>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+<script src="/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js" async></script>
+<script src="https://unpkg.com/imagesloaded@5/imagesloaded.pkgd.min.js"></script>
+
+<script>
+	$(function() {
+		console.log( "ready!" );
+	});
+
+	$(function(){
+
+		var $container = $('.image-grid');
+
+		$container.imagesLoaded(function (){
+			console.log(">>>>>", $container);
+			$container.masonry({
+				itemSelector: '.image-grid-item',
+				percentPosition: true
+			})
+		});
+
+	});
+</script>
+
+<th:block layout:fragment="script"></th:block>
+
+</body>
+</html>

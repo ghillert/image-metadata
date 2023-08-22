@@ -15,38 +15,48 @@
  */
 package com.hillert.image.metadata.service.support;
 
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.RepeatedTest;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
-import org.springframework.util.StopWatch;
-
+import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.LongSummaryStatistics;
 
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.RepeatedTest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.util.StopWatch;
+
 /**
- * This is a quick test to illustrate the differences between loading images using the AwtToolkit and using ImageIO.
- * For repeated invocations, AwtToolkit is dramatically faster. You will notice that the first invocation with
- * AwtToolkit is typically slower (But still faster than ImageIO). However, when invoked repeatably it is faster by
- * roughly a factor of 10.
+ * This is a quick test to illustrate the differences between loading images using the
+ * AwtToolkit and using ImageIO. For repeated invocations, AwtToolkit is dramatically
+ * faster. This is mostly to some employed caching by the AWT
+ * {@link Toolkit#getImage(String)} method. You will notice that the first invocation with
+ * AwtToolkit is typically slower (But still faster than ImageIO). However, when invoked
+ * repeatably it is faster by roughly a factor of 10 due to caching.
  *
  * @author Gunnar Hillert
  */
 class ImageLoaderTests {
-	
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(ImageLoaderTests.class);
+
 	private Resource imageResource = new ClassPathResource("/test-image.jpg");
 
 	private static List<Long> executionsAwtToolkit = new ArrayList<>();
+
 	private static List<Long> executionsImageIO = new ArrayList<>();
 
 	@BeforeAll
 	static void beforeAll() {
-		// Make sure to use headless mode ... For AwtToolkit, the first time execution without headless mode
+		// Make sure to use headless mode ... For AwtToolkit, the first time execution
+		// without headless mode
 		// will add 1000ms.
 		System.setProperty("java.awt.headless", "true");
 	}
@@ -56,10 +66,10 @@ class ImageLoaderTests {
 		StopWatch stopWatch = new StopWatch();
 		stopWatch.start();
 		ImageLoader imageLoader = new ImageLoader();
-		BufferedImage image = imageLoader.loadImageUsingAwtToolkit(imageResource);
+		BufferedImage image = imageLoader.loadImageUsingAwtToolkit(this.imageResource);
 		stopWatch.stop();
 		executionsAwtToolkit.add(stopWatch.getTotalTimeMillis());
-		System.out.println("loadImageUsingAwtToolkit: " + stopWatch.getTotalTimeMillis());
+		LOGGER.info("loadImageUsingAwtToolkit: " + stopWatch.getTotalTimeMillis());
 		Assertions.assertThat(image).isNotNull();
 	}
 
@@ -68,32 +78,29 @@ class ImageLoaderTests {
 		StopWatch stopWatch = new StopWatch();
 		stopWatch.start();
 		ImageLoader imageLoader = new ImageLoader();
-		BufferedImage image = imageLoader.loadImageUsingImageIO(imageResource);
+		BufferedImage image = imageLoader.loadImageUsingImageIO(this.imageResource);
 		stopWatch.stop();
 		executionsImageIO.add(stopWatch.getTotalTimeMillis());
-		System.out.println("loadImageUsingUsingImageIO: " + stopWatch.getTotalTimeMillis());
+		LOGGER.info("loadImageUsingUsingImageIO: " + stopWatch.getTotalTimeMillis());
 		Assertions.assertThat(image).isNotNull();
 	}
 
 	@AfterAll
 	static void afterAll() {
 
-		final LongSummaryStatistics imageIOStats = executionsImageIO
-				.stream()
-				.mapToLong(Long::longValue)
-				.summaryStatistics();
+		final LongSummaryStatistics imageIOStats = executionsImageIO.stream()
+			.mapToLong(Long::longValue)
+			.summaryStatistics();
 
-		System.out.println(String.format(
-				"imageIOStats - Executions=%s; Total time=%s ms; Average time=%s ms",
+		LOGGER.info(String.format("imageIOStats - Executions=%s; Total time=%sms; Average time=%sms",
 				imageIOStats.getCount(), imageIOStats.getSum(), imageIOStats.getAverage()));
 
-		final LongSummaryStatistics awtToolkitStats = executionsAwtToolkit
-				.stream()
-				.mapToLong(Long::longValue)
-				.summaryStatistics();
+		final LongSummaryStatistics awtToolkitStats = executionsAwtToolkit.stream()
+			.mapToLong(Long::longValue)
+			.summaryStatistics();
 
-		System.out.println(String.format(
-				"awtToolkitStats - Executions=%s; Total time=%s ms; Average time=%s ms",
+		LOGGER.info(String.format("awtToolkitStats - Executions=%s; Total time=%sms; Average time=%sms",
 				awtToolkitStats.getCount(), awtToolkitStats.getSum(), awtToolkitStats.getAverage()));
 	}
+
 }

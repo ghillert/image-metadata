@@ -18,18 +18,29 @@ package com.hillert.image.metadata.controller.form;
 import com.hillert.image.metadata.controller.validation.ValidImage;
 import jakarta.validation.constraints.NotNull;
 
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Contains form data when uploading an image file.
+ *
  * @author Gunnar Hillert
  */
 public class ImageUploadForm {
 
+	private boolean updateMetadataNeeded = false;
+
 	@NotNull
 	@ValidImage
 	private MultipartFile imageFile;
+
+	private String referenceId;
+
+	private String title;
+
 	private Boolean removeMetadata;
+
+	private Boolean populateWindowsTags;
 
 	public MultipartFile getImageFile() {
 		return this.imageFile;
@@ -39,6 +50,28 @@ public class ImageUploadForm {
 		this.imageFile = imageFile;
 	}
 
+	public String getReferenceId() {
+		return this.referenceId;
+	}
+
+	public void setReferenceId(String referenceId) {
+		this.referenceId = referenceId;
+		if (StringUtils.hasText(referenceId)) {
+			this.updateMetadataNeeded = true;
+		}
+	}
+
+	public Boolean getPopulateWindowsTags() {
+		return this.populateWindowsTags;
+	}
+
+	public void setPopulateWindowsTags(Boolean populateWindowsTags) {
+		this.populateWindowsTags = populateWindowsTags;
+		if (StringUtils.hasText(this.referenceId)) {
+			this.updateMetadataNeeded = true;
+		}
+	}
+
 	public Boolean getRemoveMetadata() {
 		return this.removeMetadata;
 	}
@@ -46,4 +79,20 @@ public class ImageUploadForm {
 	public void setRemoveMetadata(Boolean removeMetadata) {
 		this.removeMetadata = removeMetadata;
 	}
+
+	public boolean isUpdateMetadataNeeded() {
+		return this.updateMetadataNeeded;
+	}
+
+	public String getTitle() {
+		return this.title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+		if (StringUtils.hasText(this.title)) {
+			this.updateMetadataNeeded = true;
+		}
+	}
+
 }

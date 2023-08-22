@@ -16,7 +16,6 @@
 package com.hillert.image.metadata.service;
 
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.stream.Stream;
 
@@ -27,9 +26,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Responsible for persisting and loading the actual image file data.
+ *
  * @author Gunnar Hillert
  */
 public interface ImageService {
+
 	void init();
 
 	void store(MultipartFile file);
@@ -40,9 +41,16 @@ public interface ImageService {
 
 	Resource loadAsResource(String filename);
 
+	/**
+	 * Load an image using the provided filename and return a byte array.
+	 * @param filename must not be null
+	 * @return the image data as byte array
+	 * @throws com.hillert.image.metadata.service.support.StorageException in cases the
+	 * image could not be read
+	 */
 	byte[] loadAsBytes(String filename);
 
-	BufferedImage loadAsBufferedImage(Resource imageResource, ImageLoaderType imageLoaderType);
+	BufferedImage loadAsBufferedImage(Resource imageResource, ImageLoaderType imageLoaderType, String mimeType);
 
 	void deleteAll();
 
@@ -50,6 +58,6 @@ public interface ImageService {
 
 	void store(byte[] imageBytes, String originalFilename);
 
-	byte[] resizeImage(BufferedImage bufferedImage, String label, Integer targetWidth, ImageLoaderType imageLoaderType) throws IOException;
+	byte[] resizeImage(BufferedImage bufferedImage, String label, Integer targetWidth, String mimeType);
 
 }

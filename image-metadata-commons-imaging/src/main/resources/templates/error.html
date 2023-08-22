@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en" layout:decorate="~{global}">
+<head>
+	<title>Upload Error</title>
+</head>
+<body>
+	<main layout:fragment="content">
+		<h1>Generic Error - <span th:text="${status}">Status</span></h1>
+
+		<div class="alert alert-danger d-flex align-items-center" role="alert">
+			<i class="bi bi-exclamation-triangle flex-shrink-0 me-2"></i><div>Woops. You hit an error.</div>
+		</div>
+		<ul>
+			<li>Timestamp: <span th:text="${timestamp}">Timestamp</span></li>
+			<li>Path: <span th:text="${path}">Path</span></li>
+			<li>Error: <span th:text="${error}">Error</span></li>
+		</ul>
+		<a class="btn btn-primary mb-3" onclick="history.back()"><i class="bi bi-arrow-left"></i> Back</a>
+	</main>
+</body>
+</html>

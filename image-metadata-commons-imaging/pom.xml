@@ -1,45 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>com.hillert.metadata</groupId>
 		<artifactId>image-metadata-parent</artifactId>
 		<version>1.0.0-SNAPSHOT</version>
 	</parent>
-<!--	<parent>-->
-<!--		<groupId>org.springframework.boot</groupId>-->
-<!--		<artifactId>spring-boot-starter-parent</artifactId>-->
-<!--		<version>3.0.1</version>-->
-<!--		<relativePath/> &lt;!&ndash; lookup parent from repository &ndash;&gt;-->
-<!--	</parent>-->
+
 	<artifactId>image-metadata-commons-imaging</artifactId>
 
-	<name>Image Metadata Commons Imaging Demo</name>
+	<name>Image Metadata - Commons Imaging Demo</name>
 	<description>Examples for processing image metadata using Java and Spring Boot</description>
 
 	<properties>
 		<image-metadata.root>${basedir}/..</image-metadata.root>
-
-
-		<java.version>17</java.version>
-
-		<maven.minimum.version>3.8.6</maven.minimum.version>
-		<sonar.moduleKey>${project.artifactId}</sonar.moduleKey>
-
-		<!-- plugin dependency versions -->
-
-		<maven-checkstyle-plugin.version>3.1.2</maven-checkstyle-plugin.version>
-		<checkstyle.version>10.6.0</checkstyle.version>
-		<spring-javaformat-checkstyle.version>0.0.35</spring-javaformat-checkstyle.version>
-
-		<!-- main dependency versions -->
-		<apache-commons-imaging.version>1.0-alpha3</apache-commons-imaging.version>
-		<apache-xmlgraphics-commons.version>2.8</apache-xmlgraphics-commons.version>
-		<imagej.version>1.53q</imagej.version>
-		<spring-boot.version>3.0.1</spring-boot.version>
-		<xerces.version>2.12.2</xerces.version>
-
 	</properties>
 
 	<dependencyManagement>
@@ -58,6 +33,12 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-thymeleaf</artifactId>
+		</dependency>
+		<!-- This special version of thymeleaf-layout-dialect does not depend on Groovy -->
+		<dependency>
+			<groupId>com.github.zhanhb</groupId>
+			<artifactId>thymeleaf-layout-dialect</artifactId>
+			<version>3.2.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -90,9 +71,9 @@
 			<version>${apache-xmlgraphics-commons.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>net.imagej</groupId>
-			<artifactId>ij</artifactId>
-			<version>${imagej.version}</version>
+			<groupId>com.twelvemonkeys.common</groupId>
+			<artifactId>common-image</artifactId>
+			<version>3.9.4</version>
 		</dependency>
 		<dependency>
 			<groupId>xerces</groupId>
@@ -112,16 +93,19 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-				<version>${spring-boot.version}</version>
 			</plugin>
 			<plugin>
 				<groupId>org.graalvm.buildtools</groupId>
 				<artifactId>native-maven-plugin</artifactId>
+				<configuration>
+					<buildArgs combine.children="append">
+						<buildArg>--verbose</buildArg>
+					</buildArgs>
+				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-checkstyle-plugin</artifactId>
-				<version>${maven-checkstyle-plugin.version}</version>
 			</plugin>
 		</plugins>
 	</build>

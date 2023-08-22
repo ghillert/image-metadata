@@ -19,18 +19,20 @@ import java.util.Objects;
 
 /**
  * Meta data category. See {@link DirectoryType}.
+ *
  * @author Gunnar Hillert
  */
-public class Directory implements Comparable {
+public class Directory implements Comparable<Directory> {
 
 	@Override
-	public int compareTo(Object o) {
+	public int compareTo(Directory o) {
 		return this.getClass().getSimpleName().compareTo(o.getClass().getSimpleName());
 	}
 
 	private final DirectoryType directoryType;
 
 	private final String propertyName;
+
 	private final String propertyValue;
 
 	public Directory(DirectoryType directoryType, String propertyName, String propertyValue) {
@@ -67,4 +69,5 @@ public class Directory implements Comparable {
 	public int hashCode() {
 		return Objects.hash(this.directoryType, this.propertyName);
 	}
+
 }

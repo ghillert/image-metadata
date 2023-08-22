@@ -16,7 +16,9 @@
 package com.hillert.image.metadata.service.support;
 
 /**
- * Used by {@link com.hillert.image.metadata.service.ImageService} to determine how to load image data.
+ * Used by {@link com.hillert.image.metadata.service.ImageService} to determine how to
+ * load image data.
+ *
  * @author Gunnar Hillert
  * @see com.hillert.image.metadata.service.ImageService
  */
@@ -31,4 +33,5 @@ public enum ImageLoaderType {
 	 * Load image data using ImageIO.
 	 */
 	IMAGE_IO
+
 }

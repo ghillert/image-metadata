@@ -19,7 +19,7 @@ public class MyRuntimeHints implements RuntimeHintsRegistrar {
 	@Override
 	public void registerHints(RuntimeHints hints, ClassLoader classLoader) {
 		// Register method for reflection
-		Method method = ReflectionUtils.findMethod(ArrayList.class, "isEmpty");
+		Method method = findRequiredMethod(ArrayList.class, "isEmpty");
 		hints.reflection().registerMethod(method, ExecutableMode.INVOKE);
 
 		hints.reflection().registerType(ImageFileValidator.class, MemberCategory.INVOKE_PUBLIC_CONSTRUCTORS);
@@ -29,7 +29,15 @@ public class MyRuntimeHints implements RuntimeHintsRegistrar {
 		hints.reflection().registerType(DTDDVFactoryImpl.class, MemberCategory.INVOKE_PUBLIC_CONSTRUCTORS);
 		hints.reflection().registerType(XIncludeAwareParserConfiguration.class, MemberCategory.INVOKE_PUBLIC_CONSTRUCTORS);
 
-		Method getDefaultToolkitMethod = ReflectionUtils.findMethod(java.awt.Toolkit.class, "getDefaultToolkit");
+		try {
+			Class<?> clazz = Class.forName("com.sun.beans.finder.MethodFinder");
+			hints.reflection().registerType(clazz, MemberCategory.DECLARED_CLASSES);
+		}
+		catch (ClassNotFoundException ex) {
+			throw new IllegalStateException(ex);
+		}
+
+		Method getDefaultToolkitMethod = findRequiredMethod(java.awt.Toolkit.class, "getDefaultToolkit");
 		hints.reflection().registerMethod(getDefaultToolkitMethod, ExecutableMode.INVOKE);
 
 		hints.resources().registerPattern("fonts/*");
@@ -41,6 +49,14 @@ public class MyRuntimeHints implements RuntimeHintsRegistrar {
 		hints.jni().registerType(java.util.ArrayList.class, MemberCategory.DECLARED_CLASSES, MemberCategory.INVOKE_PUBLIC_METHODS, MemberCategory.INVOKE_DECLARED_CONSTRUCTORS);
 		hints.jni().registerType(java.lang.String.class, MemberCategory.DECLARED_CLASSES, MemberCategory.INVOKE_PUBLIC_METHODS);
 
+	}
+
+	private static Method findRequiredMethod(Class<?> clazz, String name) {
+		final Method method = ReflectionUtils.findMethod(clazz, name);
+		if (method == null) {
+			throw new IllegalStateException(String.format("Unable to find method '%s' on class '%s'.", name, clazz.getSimpleName()));
+		}
+		return method;
 	}
 }
 

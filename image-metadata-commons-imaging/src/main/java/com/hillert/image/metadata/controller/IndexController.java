@@ -18,15 +18,14 @@ package com.hillert.image.metadata.controller;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.TimeZone;
-import java.util.stream.Collectors;
 
 import com.hillert.image.metadata.controller.form.ImageUploadForm;
-import com.hillert.image.metadata.model.DirectoryType;
 import com.hillert.image.metadata.model.Metadata;
 import com.hillert.image.metadata.service.ImageService;
 import com.hillert.image.metadata.service.MetadataService;
 import com.hillert.image.metadata.service.support.ImageLoaderType;
-import jakarta.validation.Valid;
+import com.hillert.image.metadata.service.support.MetadataExtractor;
+import org.apache.commons.imaging.ImageInfo;
 
 import org.springframework.boot.autoconfigure.web.servlet.MultipartProperties;
 import org.springframework.core.io.ByteArrayResource;
@@ -36,22 +35,21 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 /**
  * Root controller.
+ *
  * @author Gunnar Hillert
  */
 @Controller
 public class IndexController {
+
+	private static final String INDEX_TEMPLATE = "index";
 
 	private final ImageService imageService;
 
@@ -59,36 +57,29 @@ public class IndexController {
 
 	private final MultipartProperties multipartProperties;
 
-	public IndexController(ImageService imageService, MetadataService metadataService, MultipartProperties multipartProperties) {
+	public IndexController(ImageService imageService, MetadataService metadataService,
+			MultipartProperties multipartProperties) {
 		this.imageService = imageService;
 		this.metadataService = metadataService;
 		this.multipartProperties = multipartProperties;
 	}
 
-	@GetMapping({"/"})
+	@GetMapping({ "/" })
 	public String index(Model model) {
 		model.addAttribute("imageUploadForm", new ImageUploadForm());
 		model.addAttribute("uploadSizeLimit", this.multipartProperties.getMaxFileSize().toMegabytes());
-		model.addAttribute("files", this.imageService.loadAll()
-				.map((path) -> path.getFileName().toString())
-				.collect(Collectors.toList()));
-		return "index";
+		model.addAttribute("files", this.imageService.loadAll().map((path) -> path.getFileName().toString()).toList());
+		return INDEX_TEMPLATE;
 	}
 
-	@GetMapping({"/uploadError"})
-	public String uploadError(Model model) {
-		return "uploadError";
-	}
-
-	@GetMapping({"/delete-image/{filename:.+}"})
-	public String deleteImage(@PathVariable String filename, RedirectAttributes redirectAttributes) {
+	@GetMapping({ "/delete-image/{filename:.+}" })
+	public String deleteImage(@PathVariable(name = "filename") String filename, RedirectAttributes redirectAttributes) {
 		this.imageService.delete(filename);
-		redirectAttributes.addFlashAttribute("message",
-				"Image deleted!");
+		redirectAttributes.addFlashAttribute("success", "Image deleted!");
 		return "redirect:/";
 	}
 
-	@GetMapping({"/image-details/{filename:.+}"})
+	@GetMapping({ "/image-details/{filename:.+}" })
 	public String getImageDetails(@PathVariable(name = "filename") String filename, Model model, TimeZone timezone) {
 
 		final Metadata metadata = this.metadataService.getExifData(this.imageService.loadAsResource(filename));
@@ -102,49 +93,34 @@ public class IndexController {
 		return "imageDetails";
 	}
 
-	@PostMapping("/")
-	public String handleFileUpload(@Valid @ModelAttribute("imageUploadForm") ImageUploadForm imageUploadForm,
-			BindingResult result, RedirectAttributes redirectAttributes) {
-
-		if (result.hasErrors()) {
-			return "index";
-		}
-
-		final MultipartFile file = imageUploadForm.getImageFile();
-		this.metadataService.getExifData(file.getResource());
-		this.imageService.store(file);
-
-		if (Boolean.TRUE.equals(imageUploadForm.getRemoveMetadata())) {
-			byte[] imageBytes = this.imageService.loadAsBytes(file.getOriginalFilename());
-			imageBytes = this.metadataService.purge(imageBytes, DirectoryType.EXIF);
-			imageBytes = this.metadataService.purge(imageBytes, DirectoryType.IPTC);
-			imageBytes = this.metadataService.purge(imageBytes, DirectoryType.XMP);
-			this.imageService.store(imageBytes, file.getOriginalFilename());
-		}
-
-		redirectAttributes.addFlashAttribute("message",
-				"You successfully uploaded " + file.getOriginalFilename() + "!");
-		return "redirect:/";
-	}
-
 	@GetMapping("/images/{filename:.+}")
 	@ResponseBody
-	public ResponseEntity<Resource> serveFile(
-			@PathVariable(name = "filename") String filename,
+	public ResponseEntity<Resource> serveFile(@PathVariable(name = "filename") String filename,
 			@RequestParam(name = "width", required = false) Integer width,
 			@RequestParam(name = "imageLoaderType", required = false) ImageLoaderType imageLoaderType,
-			@RequestParam(name = "download", required = false, defaultValue = "false") boolean download) throws IOException {
+			@RequestParam(name = "download", required = false, defaultValue = "false") boolean download)
+			throws IOException {
 		final Resource file = this.imageService.loadAsResource(filename);
-		final BufferedImage bufferedImage = this.imageService.loadAsBufferedImage(file, imageLoaderType);
-		final byte[] imageData = this.imageService.resizeImage(bufferedImage, filename, width, imageLoaderType);
-		final ByteArrayResource byteArrayResource = new ByteArrayResource(imageData);
+		byte[] imageBytes = null;
+		imageLoaderType = ImageLoaderType.IMAGE_IO;
+		final ImageInfo imageInfo = MetadataExtractor.loadImageInfo(file.getContentAsByteArray());
+
+		final BufferedImage bufferedImage = this.imageService.loadAsBufferedImage(file, imageLoaderType,
+				imageInfo.getMimeType());
+
+		imageBytes = this.imageService.resizeImage(bufferedImage, filename, width, imageInfo.getMimeType());
+
+		final ByteArrayResource byteArrayResource = new ByteArrayResource(imageBytes);
 		if (download) {
-			return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION,
-				"attachment; filename=\"" + file.getFilename() + "\"").body(file);
+			return ResponseEntity.ok()
+				.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
+				.body(byteArrayResource);
 		}
 		else {
-			return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(byteArrayResource); //TODO Right media type
+			return ResponseEntity.ok()
+				.contentType(MediaType.parseMediaType(imageInfo.getMimeType()))
+				.body(byteArrayResource);
 		}
 	}
-}
 
+}

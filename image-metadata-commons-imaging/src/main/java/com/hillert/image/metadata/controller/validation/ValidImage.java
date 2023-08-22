@@ -24,18 +24,21 @@ import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
 /**
- * Custom validation annotation to ensure that filedata exists and that
- * only certain file-types (mime-types) are supported.
+ * Custom validation annotation to ensure that filedata exists and that only certain
+ * file-types (mime-types) are supported.
+ *
  * @author Gunnar Hillert
  * @see ImageFileValidator
  */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = {ImageFileValidator.class})
+@Constraint(validatedBy = { ImageFileValidator.class })
 public @interface ValidImage {
+
 	String message() default "Invalid image file";
 
 	Class<?>[] groups() default {};
 
 	Class<? extends Payload>[] payload() default {};
+
 }

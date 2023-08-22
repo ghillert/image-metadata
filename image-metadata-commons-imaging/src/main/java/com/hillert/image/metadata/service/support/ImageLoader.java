@@ -22,6 +22,8 @@ import java.awt.MediaTracker;
 import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 
 import javax.imageio.ImageIO;
 
@@ -29,73 +31,114 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.core.io.Resource;
+import org.springframework.util.Assert;
 
+/**
+ * Provides methods to load images using Java. For demonstration purposes, 2 approaches
+ * are provided:
+ * <ul>
+ * <li>Load images using ImageIO
+ * <li>Load images using AwtToolkit
+ * </ul>
+ *
+ * @author Gunnar Hillert
+ */
 public class ImageLoader extends Component {
+
+	private static final long serialVersionUID = 1;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ImageLoader.class);
 
 	public BufferedImage loadImageUsingImageIO(Resource imageResource) {
+		Assert.notNull(imageResource, "imageResource must not be null.");
+		LOGGER.debug("Using ImageIO to load image: '{}'.", imageResource);
+
 		ImageIO.setUseCache(false);
-		BufferedImage img = null;
-		try {
-			img = ImageIO.read(imageResource.getInputStream());
+		final BufferedImage bufferedImage;
+		try (InputStream inputStream = imageResource.getInputStream()) {
+			bufferedImage = ImageIO.read(inputStream);
 		}
 		catch (IOException ex) {
-			ex.printStackTrace();
+			throw new StorageException("Unable to read image.", ex);
 		}
-		return img;
+		return bufferedImage;
 	}
 
+	/**
+	 * This method will load an image using the rather old AwtToolkit. The benefit is that
+	 * it is noticeably fast than loading an image using ImageIO.
+	 *
+	 * See:
+	 * https://stackoverflow.com/questions/15121863/image-made-through-toolkit-returns-1-as-width-height
+	 * @param imageResource the image data. Must not be null.
+	 * @return the loaded BufferedImage
+	 * @throws StorageException in case the image could not be loaded
+	 */
 	public BufferedImage loadImageUsingAwtToolkit(Resource imageResource) {
+		Assert.notNull(imageResource, "imageResource must not be null.");
 
-		/* Get the toolkit from this Component */
-		Toolkit t = Toolkit.getDefaultToolkit();
-		/* Begin a retrieval of a remote image */
-		Image   i = null;
+		final URL imageUrl;
+
 		try {
-			i = t.getImage(imageResource.getURL());
+			imageUrl = imageResource.getURL();
 		}
 		catch (IOException ex) {
-			throw new RuntimeException(ex);
+			throw new IllegalStateException("Cannot resolve URL " + imageResource.getFilename(), ex);
 		}
+
+		// LOGGER.info("Using AwtToolkit to load image.");
+
+		/* Get the toolkit from this Component */
+		final Toolkit abstractWindowToolkit = Toolkit.getDefaultToolkit();
+		/* Begin a retrieval of a remote image */
+
+		/* Image data is cached */
+		final Image image = abstractWindowToolkit.getImage(imageUrl);
+
+		/* This method will not employ caching */
+		// Image image = abstractWindowToolkit.createImage(imageUrl);
+
+		// call to clear data from cache
+		// image.flush();
+
 		/* Create a new MediaTracker linked to this Component */
-		MediaTracker m = new MediaTracker(this);
-		/* Add the loading image to the MediaTracker,
-		with an ID of 1 */
-		m.addImage(i, 1);
-		/* Explicitly wait for the image to load */
+		final MediaTracker mediaTracker = new MediaTracker(this);
+
+		/*
+		 * Add the loading image to the MediaTracker, with an ID of 1
+		 */
+		mediaTracker.addImage(image, 1);
+
+		/* Wait for the image to load */
 		try {
-			m.waitForAll();
+			mediaTracker.waitForAll();
 		}
-		/* Catch the exception */
+
 		catch (InterruptedException ex) {
-			LOGGER.warn("Loading of the image was interrupted");
+			Thread.currentThread().interrupt();
+			throw new StorageException(ex.getMessage(), ex);
 		}
 
-		/* Check the status */
-//		if( m.status() & MediaTracker.LOADING )
-//			System.out.println("Still Loading - oops, we should never be here!");
-//		if( m.status() & MediaTracker.ABORTED )
-//			System.out.println("Loading of image aborted");
-//		if( m.status() & MediaTracker.ERRORED )
-//			System.out.println("Image was errored");
-//		if( m.status() & MediaTracker.COMPLETE )
-//			System.out.println("Image load complete!");
+		if (mediaTracker.isErrorAny()) {
+			throw new StorageException("There was an error loading the image.");
+		}
 
-		return toBufferedImage(i);
+		return toBufferedImage(image);
 	}
 
 	public BufferedImage toBufferedImage(Image image) {
-		if (image instanceof BufferedImage) {
-			return (BufferedImage) image;
+		if (image instanceof BufferedImage bufferedImage) {
+			return bufferedImage;
 		}
 
-		BufferedImage bi = new BufferedImage(image.getWidth(null), image.getHeight(null),
-				BufferedImage.TYPE_INT_RGB);
-		Graphics g = bi.getGraphics();
+		final BufferedImage bufferedImage = new BufferedImage(image.getWidth(null), image.getHeight(null),
+				// BufferedImage.TYPE_INT_RGB);
+				BufferedImage.TYPE_INT_ARGB); // Needed for transparent PNGs
+		final Graphics g = bufferedImage.getGraphics();
 		g.drawImage(image, 0, 0, null);
 		g.dispose();
 
-		return bi;
+		return bufferedImage;
 	}
+
 }

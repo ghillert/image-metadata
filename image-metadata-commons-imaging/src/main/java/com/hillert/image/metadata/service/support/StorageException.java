@@ -16,11 +16,14 @@
 package com.hillert.image.metadata.service.support;
 
 /**
- * {@link RuntimeException} that indicates that image files could not be read or
- * written to the filesystem.
+ * {@link RuntimeException} that indicates that image files could not be read or written
+ * to the filesystem.
+ *
  * @author Gunnar Hillert
  */
 public class StorageException extends RuntimeException {
+
+	private static final long serialVersionUID = 1;
 
 	public StorageException(String message) {
 		super(message);
@@ -29,4 +32,5 @@ public class StorageException extends RuntimeException {
 	public StorageException(String message, Throwable cause) {
 		super(message, cause);
 	}
+
 }

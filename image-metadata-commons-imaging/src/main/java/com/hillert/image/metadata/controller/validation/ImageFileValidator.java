@@ -18,48 +18,52 @@ package com.hillert.image.metadata.controller.validation;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
+import org.springframework.http.MediaType;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
- * {@link ConstraintValidator} that ensures that a provided file is provided and
- * that only certain filetypes (mime-types) are supported.
+ * {@link ConstraintValidator} that ensures that a provided file is provided and that only
+ * certain filetypes (mime-types) are supported.
  *
- * IMPORTANT: This is merely a convenience validator in case the mime-type is not supported. If the mime-type is
- * accepted, proper backend validation of the image data shall still be performed.
+ * IMPORTANT: This is merely a convenience validator in case the mime-type is not
+ * supported. If the mime-type is accepted, proper backend validation of the image data
+ * shall still be performed.
  *
  * @author Gunnar Hillert
  */
 public class ImageFileValidator implements ConstraintValidator<ValidImage, MultipartFile> {
 
 	@Override
-	public void initialize(ValidImage constraintAnnotation) {
-
-	}
-
-	@Override
 	public boolean isValid(MultipartFile multipartFile, ConstraintValidatorContext context) {
 
 		boolean result = true;
 
-		String contentType = multipartFile.getContentType();
 		if (multipartFile.isEmpty()) {
 			context.disableDefaultConstraintViolation();
-			context.buildConstraintViolationWithTemplate(
-							"Please select a file.")
-					.addConstraintViolation();
+			context.buildConstraintViolationWithTemplate("Please select a file.").addConstraintViolation();
 
 			result = false;
 			return result;
 		}
+
+		String contentType = multipartFile.getContentType();
+
+		if (contentType == null) {
+			context.disableDefaultConstraintViolation();
+			context.buildConstraintViolationWithTemplate("Cannot retrieve content-type.").addConstraintViolation();
+
+			result = false;
+			return result;
+		}
+
 		/**
-		 * Important: Keep in mind that the contentType can be faked. A deeper validation of the uploaded file should be done in
-		 * the service layer.
+		 * Important: Keep in mind that the contentType can be faked. A deeper validation
+		 * of the uploaded file should be done in the service layer.
 		 */
 		if (!isSupportedContentType(contentType)) {
 			context.disableDefaultConstraintViolation();
-			context.buildConstraintViolationWithTemplate(
-							"Only GIF, JPG, PNG images are allowed.")
-					.addConstraintViolation();
+			context.buildConstraintViolationWithTemplate("Only GIF, JPG, PNG images are allowed.")
+				.addConstraintViolation();
 
 			result = false;
 		}
@@ -68,9 +72,8 @@ public class ImageFileValidator implements ConstraintValidator<ValidImage, Multi
 	}
 
 	private boolean isSupportedContentType(String contentType) {
-		return contentType.equals("image/png")
-				|| contentType.equals("image/gif")
-				|| contentType.equals("image/jpg")
-				|| contentType.equals("image/jpeg");
+		return contentType.equals(MediaType.IMAGE_PNG_VALUE) || contentType.equals(MediaType.IMAGE_GIF_VALUE)
+				|| contentType.equals(MediaType.IMAGE_JPEG_VALUE);
 	}
+
 }
