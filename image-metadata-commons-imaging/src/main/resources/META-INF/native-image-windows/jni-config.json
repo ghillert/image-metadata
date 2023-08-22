@@ -35,13 +35,6 @@
   "methods":[{"name":"getDefaultToolkit","parameterTypes":[] }, {"name":"getFontMetrics","parameterTypes":["java.awt.Font"] }]
 },
 {
-  "name":"java.awt.color.ICC_Profile",
-  "methods":[{"name":"cmmProfile","parameterTypes":[] }]
-},
-{
-  "name":"java.awt.color.ICC_ProfileRGB"
-},
-{
   "name":"java.awt.desktop.UserSessionEvent$Reason",
   "fields":[{"name":"CONSOLE"}, {"name":"LOCK"}, {"name":"REMOTE"}, {"name":"UNSPECIFIED"}]
 },
@@ -230,17 +223,6 @@
 {
   "name":"sun.java2d.SurfaceData",
   "fields":[{"name":"pData"}, {"name":"valid"}]
-},
-{
-  "name":"sun.java2d.cmm.lcms.LCMSImageLayout",
-  "fields":[{"name":"dataArray"}, {"name":"dataType"}, {"name":"height"}, {"name":"imageAtOnce"}, {"name":"isIntPacked"}, {"name":"nextRowOffset"}, {"name":"offset"}, {"name":"pixelType"}, {"name":"width"}]
-},
-{
-  "name":"sun.java2d.cmm.lcms.LCMSProfile"
-},
-{
-  "name":"sun.java2d.cmm.lcms.LCMSTransform",
-  "fields":[{"name":"renderType"}]
 },
 {
   "name":"sun.java2d.loops.Blit",

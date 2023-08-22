@@ -196,7 +196,7 @@
 {
   "name":"com.hillert.image.metadata.controller.ExceptionHandling",
   "queryAllDeclaredMethods":true,
-  "methods":[{"name":"<init>","parameterTypes":["org.springframework.boot.autoconfigure.web.servlet.MultipartProperties"] }, {"name":"multipartErrorHandler","parameterTypes":["com.hillert.image.metadata.service.support.ImageProcessingException","org.springframework.web.servlet.mvc.support.RedirectAttributes"] }]
+  "methods":[{"name":"<init>","parameterTypes":["org.springframework.boot.autoconfigure.web.servlet.MultipartProperties"] }]
 },
 {
   "name":"com.hillert.image.metadata.controller.GlobalControllerAdvice",
@@ -738,15 +738,6 @@
 },
 {
   "name":"org.apache.catalina.valves.ErrorReportValve"
-},
-{
-  "name":"org.apache.commons.imaging.common.BinaryFunctions"
-},
-{
-  "name":"org.apache.commons.imaging.formats.jpeg.JpegUtils"
-},
-{
-  "name":"org.apache.commons.imaging.formats.jpeg.exif.ExifRewriter"
 },
 {
   "name":"org.apache.coyote.AbstractProcessorLight"

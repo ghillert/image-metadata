@@ -31,8 +31,6 @@
   }, {
     "pattern":"\\Qorg/thymeleaf/thymeleaf.properties\\E"
   }, {
-    "pattern":"\\Qstatic/js/bootstrap.bundle.min.js\\E"
-  }, {
     "pattern":"\\Qtemplates/\\E"
   }, {
     "pattern":"\\Qtemplates/error.html\\E"
@@ -46,8 +44,6 @@
     "pattern":"java.desktop:\\Qjavax/swing/text/html/default.css\\E"
   }, {
     "pattern":"java.desktop:\\Qjavax/swing/text/html/parser/html32.bdtd\\E"
-  }, {
-    "pattern":"java.desktop:\\Qsun/java2d/cmm/profiles/sRGB.pf\\E"
   }, {
     "pattern":"java.xml:\\Qcom/sun/org/apache/xml/internal/serializer/Encodings.properties\\E"
   }]},
