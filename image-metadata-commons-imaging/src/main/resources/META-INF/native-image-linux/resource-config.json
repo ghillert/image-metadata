@@ -37,8 +37,6 @@
   }, {
     "pattern":"\\Qtemplates/\\E"
   }, {
-    "pattern":"\\Qtemplates/error.html\\E"
-  }, {
     "pattern":"\\Qtemplates/global.html\\E"
   }, {
     "pattern":"\\Qtemplates/imageDetails.html\\E"
@@ -54,9 +52,6 @@
     "pattern":"java.xml:\\Qcom/sun/org/apache/xml/internal/serializer/Encodings.properties\\E"
   }]},
   "bundles":[{
-    "name":"com.sun.org.apache.xerces.internal.impl.msg.XMLMessages",
-    "locales":[""]
-  }, {
     "name":"com.sun.org.apache.xml.internal.serializer.XMLEntities",
     "locales":[""]
   }, {
@@ -70,9 +65,6 @@
     "locales":[""]
   }, {
     "name":"jakarta.servlet.http.LocalStrings",
-    "locales":[""]
-  }, {
-    "name":"messages",
     "locales":[""]
   }, {
     "name":"org.apache.catalina.authenticator.LocalStrings",

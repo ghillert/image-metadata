@@ -1,11 +1,5 @@
 [
 {
-  "name":"[B"
-},
-{
-  "name":"[C"
-},
-{
   "name":"[I"
 },
 {
@@ -202,7 +196,7 @@
 {
   "name":"com.hillert.image.metadata.controller.ExceptionHandling",
   "queryAllDeclaredMethods":true,
-  "methods":[{"name":"<init>","parameterTypes":["org.springframework.boot.autoconfigure.web.servlet.MultipartProperties"] }, {"name":"multipartErrorHandler","parameterTypes":["com.hillert.image.metadata.service.support.ImageProcessingException","org.springframework.web.servlet.mvc.support.RedirectAttributes"] }]
+  "methods":[{"name":"<init>","parameterTypes":["org.springframework.boot.autoconfigure.web.servlet.MultipartProperties"] }]
 },
 {
   "name":"com.hillert.image.metadata.controller.GlobalControllerAdvice",
@@ -291,30 +285,6 @@
   "methods":[{"name":"<init>","parameterTypes":[] }]
 },
 {
-  "name":"com.sun.org.apache.xalan.internal.xsltc.trax.TransformerImpl"
-},
-{
-  "name":"com.sun.org.apache.xerces.internal.impl.XMLEntityScanner"
-},
-{
-  "name":"com.sun.org.apache.xerces.internal.impl.XMLVersionDetector"
-},
-{
-  "name":"com.sun.org.apache.xerces.internal.impl.io.UTF8Reader"
-},
-{
-  "name":"com.sun.org.apache.xerces.internal.jaxp.SAXParserImpl$JAXPSAXParser"
-},
-{
-  "name":"com.sun.org.apache.xerces.internal.parsers.AbstractSAXParser"
-},
-{
-  "name":"com.sun.org.apache.xerces.internal.parsers.XML11Configuration"
-},
-{
-  "name":"com.sun.org.apache.xerces.internal.parsers.XMLParser"
-},
-{
   "name":"com.twelvemonkeys.image.ImageUtil$1",
   "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
 },
@@ -401,9 +371,6 @@
   "queryAllPublicMethods":true
 },
 {
-  "name":"jakarta.servlet.http.HttpServlet"
-},
-{
   "name":"jakarta.servlet.http.PushBuilder"
 },
 {
@@ -464,7 +431,6 @@
 },
 {
   "name":"java.lang.Comparable",
-  "queryAllDeclaredMethods":true,
   "methods":[{"name":"getDescription","parameterTypes":[] }, {"name":"getName","parameterTypes":[] }, {"name":"getPropertyName","parameterTypes":[] }, {"name":"getPropertyValue","parameterTypes":[] }]
 },
 {
@@ -517,9 +483,6 @@
   "queryAllPublicMethods":true
 },
 {
-  "name":"java.lang.reflect.Method"
-},
-{
   "name":"java.lang.reflect.ParameterizedType",
   "methods":[{"name":"getActualTypeArguments","parameterTypes":[] }, {"name":"getRawType","parameterTypes":[] }]
 },
@@ -540,18 +503,6 @@
 },
 {
   "name":"java.net.SocketPermission"
-},
-{
-  "name":"java.net.URI",
-  "allDeclaredFields":true,
-  "queryAllDeclaredMethods":true,
-  "queryAllDeclaredConstructors":true
-},
-{
-  "name":"java.net.URL",
-  "allDeclaredFields":true,
-  "queryAllDeclaredMethods":true,
-  "queryAllDeclaredConstructors":true
 },
 {
   "name":"java.net.URLPermission",
@@ -692,12 +643,6 @@
   "methods":[{"name":"clearCache","parameterTypes":[] }]
 },
 {
-  "name":"jdk.internal.reflect.DelegatingMethodAccessorImpl"
-},
-{
-  "name":"jdk.internal.reflect.NativeMethodAccessorImpl"
-},
-{
   "name":"kotlin$Metadata"
 },
 {
@@ -746,30 +691,9 @@
   "methods":[{"name":"getPrefixForDialect","parameterTypes":["org.thymeleaf.context.IContext","java.lang.Class"] }]
 },
 {
-  "name":"org.apache.catalina.authenticator.AuthenticatorBase"
-},
-{
-  "name":"org.apache.catalina.connector.CoyoteAdapter"
-},
-{
   "name":"org.apache.catalina.core.ApplicationContextFacade",
   "queryAllDeclaredMethods":true,
   "methods":[{"name":"addFilter","parameterTypes":["java.lang.String","jakarta.servlet.Filter"] }, {"name":"addFilter","parameterTypes":["java.lang.String","java.lang.Class"] }, {"name":"addFilter","parameterTypes":["java.lang.String","java.lang.String"] }, {"name":"addJspFile","parameterTypes":["java.lang.String","java.lang.String"] }, {"name":"addListener","parameterTypes":["java.lang.Class"] }, {"name":"addListener","parameterTypes":["java.lang.String"] }, {"name":"addListener","parameterTypes":["java.util.EventListener"] }, {"name":"addServlet","parameterTypes":["java.lang.String","jakarta.servlet.Servlet"] }, {"name":"addServlet","parameterTypes":["java.lang.String","java.lang.Class"] }, {"name":"addServlet","parameterTypes":["java.lang.String","java.lang.String"] }, {"name":"createFilter","parameterTypes":["java.lang.Class"] }, {"name":"createListener","parameterTypes":["java.lang.Class"] }, {"name":"createServlet","parameterTypes":["java.lang.Class"] }, {"name":"declareRoles","parameterTypes":["java.lang.String[]"] }, {"name":"getAttribute","parameterTypes":["java.lang.String"] }, {"name":"getAttributeNames","parameterTypes":[] }, {"name":"getClassLoader","parameterTypes":[] }, {"name":"getContext","parameterTypes":["java.lang.String"] }, {"name":"getContextPath","parameterTypes":[] }, {"name":"getDefaultSessionTrackingModes","parameterTypes":[] }, {"name":"getEffectiveMajorVersion","parameterTypes":[] }, {"name":"getEffectiveMinorVersion","parameterTypes":[] }, {"name":"getEffectiveSessionTrackingModes","parameterTypes":[] }, {"name":"getFilterRegistration","parameterTypes":["java.lang.String"] }, {"name":"getFilterRegistrations","parameterTypes":[] }, {"name":"getInitParameter","parameterTypes":["java.lang.String"] }, {"name":"getInitParameterNames","parameterTypes":[] }, {"name":"getJspConfigDescriptor","parameterTypes":[] }, {"name":"getMajorVersion","parameterTypes":[] }, {"name":"getMimeType","parameterTypes":["java.lang.String"] }, {"name":"getMinorVersion","parameterTypes":[] }, {"name":"getNamedDispatcher","parameterTypes":["java.lang.String"] }, {"name":"getRealPath","parameterTypes":["java.lang.String"] }, {"name":"getRequestCharacterEncoding","parameterTypes":[] }, {"name":"getRequestDispatcher","parameterTypes":["java.lang.String"] }, {"name":"getResource","parameterTypes":["java.lang.String"] }, {"name":"getResourceAsStream","parameterTypes":["java.lang.String"] }, {"name":"getResourcePaths","parameterTypes":["java.lang.String"] }, {"name":"getResponseCharacterEncoding","parameterTypes":[] }, {"name":"getServerInfo","parameterTypes":[] }, {"name":"getServletContextName","parameterTypes":[] }, {"name":"getServletRegistration","parameterTypes":["java.lang.String"] }, {"name":"getServletRegistrations","parameterTypes":[] }, {"name":"getSessionCookieConfig","parameterTypes":[] }, {"name":"getSessionTimeout","parameterTypes":[] }, {"name":"getVirtualServerName","parameterTypes":[] }, {"name":"log","parameterTypes":["java.lang.String"] }, {"name":"log","parameterTypes":["java.lang.String","java.lang.Throwable"] }, {"name":"removeAttribute","parameterTypes":["java.lang.String"] }, {"name":"setAttribute","parameterTypes":["java.lang.String","java.lang.Object"] }, {"name":"setInitParameter","parameterTypes":["java.lang.String","java.lang.String"] }, {"name":"setRequestCharacterEncoding","parameterTypes":["java.lang.String"] }, {"name":"setResponseCharacterEncoding","parameterTypes":["java.lang.String"] }, {"name":"setSessionTimeout","parameterTypes":["int"] }, {"name":"setSessionTrackingModes","parameterTypes":["java.util.Set"] }]
-},
-{
-  "name":"org.apache.catalina.core.ApplicationFilterChain"
-},
-{
-  "name":"org.apache.catalina.core.StandardContextValve"
-},
-{
-  "name":"org.apache.catalina.core.StandardEngineValve"
-},
-{
-  "name":"org.apache.catalina.core.StandardHostValve"
-},
-{
-  "name":"org.apache.catalina.core.StandardWrapperValve"
 },
 {
   "name":"org.apache.catalina.loader.JdbcLeakPrevention",
@@ -780,17 +704,8 @@
   "methods":[{"name":"<init>","parameterTypes":[] }]
 },
 {
-  "name":"org.apache.catalina.valves.ErrorReportValve"
-},
-{
-  "name":"org.apache.coyote.AbstractProcessorLight"
-},
-{
   "name":"org.apache.coyote.AbstractProtocol",
   "methods":[{"name":"getAddress","parameterTypes":[] }, {"name":"getLocalPort","parameterTypes":[] }, {"name":"setPort","parameterTypes":["int"] }, {"name":"setProperty","parameterTypes":["java.lang.String","java.lang.String"] }]
-},
-{
-  "name":"org.apache.coyote.AbstractProtocol$ConnectionHandler"
 },
 {
   "name":"org.apache.coyote.http11.AbstractHttp11Protocol",
@@ -801,17 +716,8 @@
   "queryAllPublicMethods":true
 },
 {
-  "name":"org.apache.coyote.http11.Http11Processor"
-},
-{
   "name":"org.apache.el.ExpressionFactoryImpl",
   "methods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
-  "name":"org.apache.jasper.compiler$JspConfig"
-},
-{
-  "name":"org.apache.jasper.compiler.JspConfig"
 },
 {
   "name":"org.apache.jasper.servlet$JspServlet"
@@ -840,21 +746,6 @@
   "queryAllPublicMethods":true
 },
 {
-  "name":"org.apache.tomcat.util.net.NioEndpoint$SocketProcessor"
-},
-{
-  "name":"org.apache.tomcat.util.net.SocketProcessorBase"
-},
-{
-  "name":"org.apache.tomcat.util.threads.TaskThread$WrappingRunnable"
-},
-{
-  "name":"org.apache.tomcat.util.threads.ThreadPoolExecutor"
-},
-{
-  "name":"org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker"
-},
-{
   "name":"org.apache.tomcat.websocket.server.WsFilter",
   "queryAllDeclaredMethods":true
 },
@@ -868,24 +759,6 @@
 {
   "name":"org.apache.xerces.parsers.XIncludeAwareParserConfiguration",
   "methods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
-  "name":"org.apache.xmlgraphics.xmp.XMPParser"
-},
-{
-  "name":"org.attoparser.HtmlElement"
-},
-{
-  "name":"org.attoparser.HtmlMarkupHandler"
-},
-{
-  "name":"org.attoparser.MarkupEventProcessorHandler"
-},
-{
-  "name":"org.attoparser.MarkupParser"
-},
-{
-  "name":"org.attoparser.ParsingElementMarkupUtil"
 },
 {
   "name":"org.codehaus.groovy.runtime.InvokerHelper"
@@ -1411,8 +1284,7 @@
 },
 {
   "name":"org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController",
-  "queryAllDeclaredMethods":true,
-  "methods":[{"name":"errorHtml","parameterTypes":["jakarta.servlet.http.HttpServletRequest","jakarta.servlet.http.HttpServletResponse"] }]
+  "queryAllDeclaredMethods":true
 },
 {
   "name":"org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration",
@@ -1733,43 +1605,6 @@
   "queryAllDeclaredMethods":true
 },
 {
-  "name":"org.springframework.core.io.AbstractResource",
-  "allDeclaredFields":true,
-  "queryAllDeclaredMethods":true
-},
-{
-  "name":"org.springframework.core.io.ByteArrayResource",
-  "allDeclaredFields":true,
-  "queryAllDeclaredMethods":true,
-  "queryAllDeclaredConstructors":true
-},
-{
-  "name":"org.springframework.core.io.InputStreamSource",
-  "queryAllDeclaredMethods":true
-},
-{
-  "name":"org.springframework.core.io.Resource",
-  "queryAllDeclaredMethods":true
-},
-{
-  "name":"org.springframework.expression.spel.ast.CompoundExpression"
-},
-{
-  "name":"org.springframework.expression.spel.ast.MethodReference"
-},
-{
-  "name":"org.springframework.expression.spel.ast.MethodReference$MethodValueRef"
-},
-{
-  "name":"org.springframework.expression.spel.ast.SpelNodeImpl"
-},
-{
-  "name":"org.springframework.expression.spel.standard.SpelExpression"
-},
-{
-  "name":"org.springframework.expression.spel.support.ReflectiveMethodExecutor"
-},
-{
   "name":"org.springframework.hateoas.server.mvc.TypeConstrainedMappingJackson2HttpMessageConverter"
 },
 {
@@ -1876,9 +1711,6 @@
   "methods":[{"name":"noMatchingExceptionHandler","parameterTypes":[] }]
 },
 {
-  "name":"org.springframework.web.method.support.InvocableHandlerMethod"
-},
-{
   "name":"org.springframework.web.multipart.MultipartFile",
   "queryAllDeclaredMethods":true,
   "methods":[{"name":"<init>","parameterTypes":["org.springframework.web.multipart.support.StandardMultipartHttpServletRequest$StandardMultipartFile"] }, {"name":"from","parameterTypes":["org.springframework.web.multipart.support.StandardMultipartHttpServletRequest$StandardMultipartFile"] }, {"name":"of","parameterTypes":["org.springframework.web.multipart.support.StandardMultipartHttpServletRequest$StandardMultipartFile"] }, {"name":"valueOf","parameterTypes":["org.springframework.web.multipart.support.StandardMultipartHttpServletRequest$StandardMultipartFile"] }]
@@ -1895,12 +1727,6 @@
 },
 {
   "name":"org.springframework.web.reactive.result.view.View"
-},
-{
-  "name":"org.springframework.web.servlet.DispatcherServlet"
-},
-{
-  "name":"org.springframework.web.servlet.FrameworkServlet"
 },
 {
   "name":"org.springframework.web.servlet.View",
@@ -1932,23 +1758,8 @@
   "methods":[{"name":"handle","parameterTypes":[] }]
 },
 {
-  "name":"org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter"
-},
-{
   "name":"org.springframework.web.servlet.mvc.method.RequestMappingInfoHandlerMapping$HttpOptionsHandler",
   "methods":[{"name":"handle","parameterTypes":[] }]
-},
-{
-  "name":"org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter"
-},
-{
-  "name":"org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod"
-},
-{
-  "name":"org.springframework.web.servlet.support.BindStatus"
-},
-{
-  "name":"org.springframework.web.servlet.support.RequestContext"
 },
 {
   "name":"org.springframework.web.servlet.view.AbstractCachingViewResolver",
@@ -1986,30 +1797,6 @@
   "queryAllPublicMethods":true
 },
 {
-  "name":"org.thymeleaf.engine.GatheringModelProcessable"
-},
-{
-  "name":"org.thymeleaf.engine.Model"
-},
-{
-  "name":"org.thymeleaf.engine.OpenElementTag"
-},
-{
-  "name":"org.thymeleaf.engine.ProcessorTemplateHandler"
-},
-{
-  "name":"org.thymeleaf.engine.TemplateHandlerAdapterMarkupHandler"
-},
-{
-  "name":"org.thymeleaf.engine.TemplateManager"
-},
-{
-  "name":"org.thymeleaf.processor.element.AbstractAttributeTagProcessor"
-},
-{
-  "name":"org.thymeleaf.processor.element.AbstractElementTagProcessor"
-},
-{
   "name":"org.thymeleaf.spring6.ISpringTemplateEngine",
   "queryAllDeclaredMethods":true,
   "queryAllPublicMethods":true
@@ -2020,12 +1807,9 @@
   "methods":[{"name":"setMessageSource","parameterTypes":["org.springframework.context.MessageSource"] }, {"name":"setTemplateEngineMessageSource","parameterTypes":["org.springframework.context.MessageSource"] }]
 },
 {
-  "name":"org.thymeleaf.spring6.context.webmvc.SpringWebMvcThymeleafRequestContext"
-},
-{
   "name":"org.thymeleaf.spring6.expression.Fields",
   "queryAllPublicMethods":true,
-  "methods":[{"name":"allErrors","parameterTypes":[] }, {"name":"hasAnyErrors","parameterTypes":[] }]
+  "methods":[{"name":"hasAnyErrors","parameterTypes":[] }]
 },
 {
   "name":"org.thymeleaf.spring6.expression.Mvc",
@@ -2045,15 +1829,9 @@
   "methods":[{"name":"<init>","parameterTypes":[] }]
 },
 {
-  "name":"org.thymeleaf.spring6.expression.SPELVariableExpressionEvaluator"
-},
-{
   "name":"org.thymeleaf.spring6.templateresolver.SpringResourceTemplateResolver",
   "queryAllDeclaredMethods":true,
   "methods":[{"name":"setApplicationContext","parameterTypes":["org.springframework.context.ApplicationContext"] }]
-},
-{
-  "name":"org.thymeleaf.spring6.util.FieldUtils"
 },
 {
   "name":"org.thymeleaf.spring6.view.ThymeleafView",
@@ -2081,9 +1859,6 @@
   "methods":[{"name":"isLeftAllowed","parameterTypes":["org.thymeleaf.standard.expression.IStandardExpression"] }, {"name":"isRightAllowed","parameterTypes":["org.thymeleaf.standard.expression.IStandardExpression"] }]
 },
 {
-  "name":"org.thymeleaf.standard.expression.Expression"
-},
-{
   "name":"org.thymeleaf.standard.expression.GreaterLesserExpression",
   "methods":[{"name":"isLeftAllowed","parameterTypes":["org.thymeleaf.standard.expression.IStandardExpression"] }, {"name":"isRightAllowed","parameterTypes":["org.thymeleaf.standard.expression.IStandardExpression"] }]
 },
@@ -2094,30 +1869,6 @@
 {
   "name":"org.thymeleaf.standard.expression.OrExpression",
   "methods":[{"name":"isLeftAllowed","parameterTypes":["org.thymeleaf.standard.expression.IStandardExpression"] }, {"name":"isRightAllowed","parameterTypes":["org.thymeleaf.standard.expression.IStandardExpression"] }]
-},
-{
-  "name":"org.thymeleaf.standard.expression.SimpleExpression"
-},
-{
-  "name":"org.thymeleaf.standard.expression.VariableExpression"
-},
-{
-  "name":"org.thymeleaf.standard.inline.OutputExpressionInlinePreProcessorHandler"
-},
-{
-  "name":"org.thymeleaf.standard.processor.AbstractStandardConditionalVisibilityTagProcessor"
-},
-{
-  "name":"org.thymeleaf.standard.processor.StandardIfTagProcessor"
-},
-{
-  "name":"org.thymeleaf.templateparser.markup.AbstractMarkupTemplateParser"
-},
-{
-  "name":"org.thymeleaf.templateparser.markup.InlinedOutputExpressionMarkupHandler"
-},
-{
-  "name":"org.thymeleaf.templateparser.markup.InlinedOutputExpressionMarkupHandler$InlineMarkupAdapterPreProcessorHandler"
 },
 {
   "name":"org.thymeleaf.templateresolver.AbstractConfigurableTemplateResolver",
@@ -2135,9 +1886,6 @@
   "queryAllPublicMethods":true
 },
 {
-  "name":"org.thymeleaf.util.ProcessorConfigurationUtils$ElementTagProcessorWrapper"
-},
-{
   "name":"reactor.core.publisher$Flux"
 },
 {
@@ -2148,10 +1896,6 @@
 },
 {
   "name":"reactor.tools.agent.ReactorDebugAgent"
-},
-{
-  "name":"sun.awt.X11FontManager",
-  "methods":[{"name":"<init>","parameterTypes":[] }]
 },
 {
   "name":"sun.java2d.loops.OpaqueCopyAnyToArgb",
