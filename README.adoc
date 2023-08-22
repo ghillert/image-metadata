@@ -139,6 +139,18 @@ Luckily as of the latest GraalVM for JDK 17.0.8 release the situation on Windows
 See the following https://medium.com/graalvm/a-new-graalvm-release-and-new-free-license-4aab483692f5[blog post]
 for details.
 
+*IMPORTANT*
+
+When using AWT and ImageIO classes etc. the native GraalVM Native Image metadata seems to be specific to the relevant platform.
+Therefore, you may need to rename the respective folder under
+`image-metadata-commons-imaging/src/main/resource/META-INF` to `native-image`. I provide the following folders:
+
+- native-image-linux
+- native-image-mac
+- native-image-windows
+
+Alternatively, you can run the *native-image-agent* as described under *Development* below.
+
 === Creating a Local Native Image
 
 Creating a local image should be as easy as:
@@ -186,13 +198,18 @@ java.lang.UnsatisfiedLinkError: no awt in java.library.path
 However, compilation will succeed and the application will run when using
 https://bell-sw.com/pages/downloads/native-image-kit/[Liberica Native Image Kit] (NIK).
 
+[source,bash]
+----
+./image-metadata-commons-imaging/target/image-metadata-commons-imaging
+----
+
 ==== Windows
 
 On Windows (With the latest version of GraalVM), things got super-easy, just compile and run:
 
 [source,bash]
 ----
-image-metadata-commons-imaging.exe
+image-metadata-commons-imaging/target/image-metadata-commons-imaging.exe
 ----
 
 ==== Linux
@@ -220,7 +237,7 @@ application using:
 
 [source,bash]
 ----
-./image-metadata-commons-imaging/target/image-metadata-commons-imaging\
+./image-metadata-commons-imaging/target/image-metadata-commons-imaging \
 -Djava.home=iage-metadata-commons-imaging/src/lib/
 ----
 
