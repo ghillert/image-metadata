@@ -2,6 +2,8 @@
 
 = Image Metadata processing using Java
 
+image:https://github.com/ghillert/image-metadata/workflows/Java%20CI%20with%20Maven/badge.svg[CI Image Metadata,link=https://github.com/ghillert/image-metadata/actions]
+
 This repository contains examples for processing image metadata using Java. Currently, the following module
 is available:
 
