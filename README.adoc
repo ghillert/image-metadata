@@ -90,11 +90,40 @@ Please also see the EXIF tag documentation at https://exiftool.org/TagNames/EXIF
 
 === Requirements
 
-- https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html[Java 17]
-- https://help.github.com/set-up-git-redirect[Git]
-- For native compilation:
-  * https://bell-sw.com/pages/downloads/native-image-kit/[Liberica Native Image Kit] (NIK) (tested)
-  * https://www.graalvm.org/downloads/[GraalVM 22.3.2] (Not fully tested)
+- https://git-scm.com/[Git] to clone the repository
+
+==== Standard Java
+
+- https://www.oracle.com/java/technologies/downloads/#java21[Java 21] or
+- https://www.oracle.com/java/technologies/downloads/#java17[Java 17]
+
+TIP: Use https://sdkman.io/[SDKMAN!] to install any version of Java.
+
+==== Native Compilation:
+
+For the native compilation support, you will need a https://www.graalvm.org/[GraalVM] based implementation of Java. As
+this application uses AWT classes, Bellsoft's https://bell-sw.com/liberica-native-image-kit/[Liberica Native Image Kit] (NIK)
+is currently (as of Oct 24, 2023) the best implementation. The following version was used for testing:
+
+- https://bell-sw.com/pages/downloads/native-image-kit/[BellSoft 23.1.r21-nik]
+
+[NOTE]
+====
+Oracle GraalVM does not work on *MacOS*, yet. You will encounter a `No awt in java.library.path`. See
+https://github.com/oracle/graal/issues/4124 for details.
+
+If you try, you will see an exception like the following:
+
+[source,bash,indent=0,subs=attributes]
+----
+2023-02-12T09:38:34.721-10:00 ERROR 65901 --- [nio-8080-exec-8] o.a.c.c.C.[.[.[/].[dispatcherServlet]    : Servlet.service() for servlet [dispatcherServlet] in context with path [] threw exception [Handler dispatch failed: java.lang.UnsatisfiedLinkError: no awt in java.library.path] with root cause
+
+java.lang.UnsatisfiedLinkError: no awt in java.library.path
+...
+----
+====
+
+TIP: Use https://sdkman.io/[SDKMAN!] to install GraalVM.
 
 === Check out source code
 
@@ -122,7 +151,7 @@ java -jar ./image-metadata-commons-imaging/target/image-metadata-commons-imaging
 
 Open your browser and go to http://localhost:8080/
 
-=== Run + Run in one go
+=== Build + Run in one go
 
 [source,bash,indent=0,subs=attributes]
 ----
@@ -131,13 +160,13 @@ Open your browser and go to http://localhost:8080/
 
 == Going Native
 
-Native compilation has been a bit of a moving target when using AWT classes. Luckily the situation is
-continuously improving. For instance until recently the story on Windows was a bit more involved, requiring
+Native compilation has been a bit of a moving target when using AWT classes. Luckily, the situation is
+continuously improving. For instance, until recently the story on Windows was a bit more involved, requiring
 to compile the project using the *x64 Native Tools Command Prompt for VS 2022* (See the following
 https://medium.com/graalvm/using-graalvm-and-native-image-on-windows-10-9954dc071311[blog post]
 for more information.)
 
-Luckily as of the latest GraalVM for JDK 17.0.8 release the situation on Windows is much improved -
+Luckily as of GraalVM for JDK 17.0.8 the situation on Windows is much improved -
 See the following https://medium.com/graalvm/a-new-graalvm-release-and-new-free-license-4aab483692f5[blog post]
 for details.
 
@@ -179,23 +208,13 @@ The result (if successful) will be an executable binary at: `image-metadata-comm
 TIP: You can use https://upx.github.io/[Ultimate Packer for eXecutables] (UPX) to further compress the binary. E.g.
 `upx -9 image-metadata-commons-imaging/target/image-metadata-commons-imaging`
 
-NOTE: UPX seems to be broken currently on MacOS 13. See the relevant https://github.com/upx/upx/issues/612[GitHub issue ticket]
+NOTE: UPX is currently broken on MacOS 13. See the relevant https://github.com/upx/upx/issues/612[GitHub issue ticket]
 for details.
 
 ==== macOS
 
 As the application uses some AWT classes for image processing, the native version for macOS will not run using Oracle
 GraalVM. There is an https://github.com/oracle/graal/issues/4124[open GitHub issue] at the GraalVM project.
-
-If you try, you will see an exception like the following:
-
-[source,bash,indent=0,subs=attributes]
-----
-2023-02-12T09:38:34.721-10:00 ERROR 65901 --- [nio-8080-exec-8] o.a.c.c.C.[.[.[/].[dispatcherServlet]    : Servlet.service() for servlet [dispatcherServlet] in context with path [] threw exception [Handler dispatch failed: java.lang.UnsatisfiedLinkError: no awt in java.library.path] with root cause
-
-java.lang.UnsatisfiedLinkError: no awt in java.library.path
-...
-----
 
 However, compilation will succeed and the application will run when using
 https://bell-sw.com/pages/downloads/native-image-kit/[Liberica Native Image Kit] (NIK).
@@ -257,9 +276,7 @@ See also: https://github.com/graalvm/mandrel/issues/189
 
 === Docker
 
-NOTE: Not fully tested yet. But should be similar to the Linux steps above.
-
-_image-metadata-commons-imaging_ uses fonts, which on Linux require `fontconfig` to be installed. That's why I use
+_image-metadata-commons-imaging_ uses fonts, which on Linux requires `fontconfig` to be installed. That's why I use
 `paketobuildpacks/builder:full` and not the default `paketobuildpacks/builder:tiny`.
 
 IMPORTANT: Please make sure your Docker daemon is running.
