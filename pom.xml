@@ -78,7 +78,7 @@
 
 		<!-- main dependency versions -->
 		<apache-commons-imaging.version>1.0-alpha3</apache-commons-imaging.version>
-		<apache-xmlgraphics-commons.version>2.8</apache-xmlgraphics-commons.version>
+		<apache-xmlgraphics-commons.version>2.9</apache-xmlgraphics-commons.version>
 		<imagej.version>1.54d</imagej.version>
 		<spring-boot.version>3.1.5</spring-boot.version>
 		<xerces.version>2.12.2</xerces.version>
