@@ -104,7 +104,21 @@ public final class MetadataExtractor {
 
 	public static List<Directory> getXMPMetadata(Resource resource) {
 
+		final String xmpString = getXMPMetadataAsString(resource);
 		final List<Directory> directories = new ArrayList<>();
+
+
+		if (!StringUtils.hasText(xmpString)) {
+			return directories;
+		}
+
+		LOGGER.info(xmpString);
+
+		return getXMPMetadata(xmpString);
+
+	}
+
+	public static String getXMPMetadataAsString(Resource resource) {
 		final String xmpString;
 		try {
 			xmpString = Imaging.getXmpXml(resource.getInputStream(), resource.getFilename());
@@ -115,19 +129,17 @@ public final class MetadataExtractor {
 		catch (IOException ex) {
 			throw new IllegalStateException(ex);
 		}
+		return CommonUtils.formatXml(xmpString, false);
+	}
 
-		if (!StringUtils.hasText(xmpString)) {
-			return directories;
-		}
-
-		LOGGER.info(xmpString);
+	public static List<Directory> getXMPMetadata(String xmpString) {
+		Assert.hasText(xmpString, "xmpString must not be null or empty.");
+		final List<Directory> directories = new ArrayList<>();
 
 		try {
-			// org.apache.xmlgraphics.xmp.Metadata xmpMetaData = XMPParser.parseXMP(new
-			// StreamSource(new StringReader(xmpString)));
 
 			org.apache.xmlgraphics.xmp.Metadata xmpMetaData = XMPParser
-				.parseXMP(new StreamSource(new StringReader(xmpString.substring(0, xmpString.lastIndexOf('>') + 1))));
+					.parseXMP(new StreamSource(new StringReader(xmpString)));
 
 			for (Iterator<?> it = xmpMetaData.iterator(); it.hasNext();) {
 				QName key = (QName) it.next();
@@ -145,7 +157,7 @@ public final class MetadataExtractor {
 			LOGGER.info("XMP Property Count: {}", xmpMetaData.getPropertyCount());
 		}
 		catch (TransformerException ex) {
-			throw new IllegalStateException(ex); // TODO
+			throw new ImageProcessingException("Unable to parse XMP XML data.", ex);
 		}
 		return directories;
 	}

@@ -97,6 +97,7 @@ public class IndexController {
 	@ResponseBody
 	public ResponseEntity<Resource> serveFile(@PathVariable(name = "filename") String filename,
 			@RequestParam(name = "width", required = false) Integer width,
+			@RequestParam(name = "addLabel", required = false, defaultValue = "true") boolean addLabel,
 			@RequestParam(name = "imageLoaderType", required = false) ImageLoaderType imageLoaderType,
 			@RequestParam(name = "download", required = false, defaultValue = "false") boolean download)
 			throws IOException {
@@ -108,7 +109,16 @@ public class IndexController {
 		final BufferedImage bufferedImage = this.imageService.loadAsBufferedImage(file, imageLoaderType,
 				imageInfo.getMimeType());
 
-		imageBytes = this.imageService.resizeImage(bufferedImage, filename, width, imageInfo.getMimeType());
+		final String label;
+
+		if (addLabel) {
+			label = filename;
+		}
+		else {
+			label = null;
+		}
+
+		imageBytes = this.imageService.resizeImage(bufferedImage, label, width, imageInfo.getMimeType());
 
 		final ByteArrayResource byteArrayResource = new ByteArrayResource(imageBytes);
 		if (download) {

@@ -5,13 +5,12 @@
 </head>
 <body>
 	<main layout:fragment="content">
-<!--		<div class="alert alert-success d-flex align-items-center" role="alert" th:if="${success ne null}">-->
-<!--			<i class="bi bi-check-circle flex-shrink-0 me-2"></i><div th:text="${success}">Success Message</div>-->
-<!--		</div>-->
-<!--		<div class="alert alert-danger d-flex align-items-center" role="alert" th:if="${error ne null}">-->
-<!--			<i class="bi bi-exclamation-triangle flex-shrink-0 me-2"></i><div th:text="${error}">Error Message</div>-->
-<!--			Error Message-->
-<!--		</div>-->
+		<div class="alert alert-success d-flex align-items-center" role="alert" th:if="${success ne null}">
+			<i class="bi bi-check-circle flex-shrink-0 me-2"></i><div th:text="${success}">Success Message</div>
+		</div>
+		<div class="alert alert-danger d-flex align-items-center" role="alert" th:if="${error ne null}">
+			<i class="bi bi-exclamation-triangle flex-shrink-0 me-2"></i><div th:text="${error}">Error Message</div>
+		</div>
 
 		<h1>Let's get started by uploading an image!</h1>
 		<p class="fs-5 col-md-8">The image you upload will be resized and the metadata will be extracted.</p>
@@ -19,20 +18,16 @@
 		<form name="imageUploadForm" id="imageForm" method="POST" enctype="multipart/form-data"
 			  th:action="@{'/'}" th:object="${imageUploadForm}">
 
-<!--			<div th:if="${#fields.hasErrors('*')}">-->
-
-<!--				<div class="alert alert-danger d-flex align-items-center" role="alert" th:each="err : ${#fields.errors('imageUploadForm.*')}" th:text="${err}">-->
-<!--					Error Message-->
-<!--				</div>-->
-
-<!--			</div>-->
+			<div th:if="${#fields.hasErrors('*')}">
+				<div class="alert alert-danger d-flex align-items-center" role="alert" th:each="err : ${#fields.errors('imageUploadForm.*')}" th:text="${err}">
+					Error Message
+				</div>
+			</div>
 
 			<div th:if="${#fields.hasAnyErrors()}">
-
 				<div class="alert alert-danger d-flex align-items-center" role="alert" th:each="err : ${#fields.allErrors()}">
-					<i class="bi bi-exclamation-triangle flex-shrink-0 me-2"></i><div th:text="${err}">Error Message</div>
+					<i class="bi bi-exclamation-triangle flex-shrink-0 me-2"></i><div th:text="${err}"></div>
 				</div>
-
 			</div>
 
 			<div class="mb-2">
@@ -101,10 +96,9 @@
 				<p>Some additional resources for retrieving image metadata.</p>
 				<ul>
 					<li class="d-flex align-items-start mb-1"><a href="https://medium.com/@hillert/read-write-image-metadata-with-java-part-1-d5e2057c80d9" rel="noopener" target="_blank">Read & Write Image Metadata with Java — Part 1</a></li>
-					<li class="text-muted d-flex align-items-start mb-1">Read & Write Image Metadata with Java — Part 2 (coming soon!)</li>
+					<li class="d-flex align-items-start mb-1"><a href="https://medium.com/@hillert/read-write-image-metadata-with-java-part-2-9c5c0d817021" rel="noopener" target="_blank">Read & Write Image Metadata with Java — Part 2</a></li>
 				</ul>
 			</div>
-
 			<div class="col-md-6">
 				<h2>Used Frameworks/Libraries</h2>
 				<ul class="icon-list ps-0">

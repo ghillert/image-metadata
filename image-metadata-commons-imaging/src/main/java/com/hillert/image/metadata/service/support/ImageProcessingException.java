@@ -16,7 +16,7 @@
 package com.hillert.image.metadata.service.support;
 
 /**
- * {@link RuntimeException} that is throw in case image data cannot be processed.
+ * {@link RuntimeException} that is thrown in case image data cannot be processed.
  *
  * @author Gunnar Hillert
  */

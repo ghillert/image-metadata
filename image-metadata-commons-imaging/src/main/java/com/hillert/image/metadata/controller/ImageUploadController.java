@@ -27,8 +27,10 @@ import org.apache.commons.imaging.ImageInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.springframework.boot.autoconfigure.web.servlet.MultipartProperties;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
 import org.springframework.util.StopWatch;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -53,9 +55,12 @@ public class ImageUploadController {
 
 	private final MetadataService metadataService;
 
-	public ImageUploadController(ImageService imageService, MetadataService metadataService) {
+	private final MultipartProperties multipartProperties;
+
+	public ImageUploadController(ImageService imageService, MetadataService metadataService, MultipartProperties multipartProperties) {
 		this.imageService = imageService;
 		this.metadataService = metadataService;
+		this.multipartProperties = multipartProperties;
 	}
 
 	@GetMapping({ "/upload-error" })
@@ -65,11 +70,14 @@ public class ImageUploadController {
 
 	@PostMapping("/")
 	public String handleFileUpload(@Valid @ModelAttribute("imageUploadForm") ImageUploadForm imageUploadForm,
-			BindingResult result, RedirectAttributes redirectAttributes) {
+				BindingResult result,
+				RedirectAttributes redirectAttributes, ModelMap model) {
 
 		StopWatch stopWatch = new StopWatch();
 		stopWatch.start();
 		if (result.hasErrors()) {
+			model.addAttribute("uploadSizeLimit", this.multipartProperties.getMaxFileSize().toMegabytes());
+			model.addAttribute("files", this.imageService.loadAll().map((path) -> path.getFileName().toString()).toList());
 			return INDEX_TEMPLATE;
 		}
 
@@ -90,11 +98,15 @@ public class ImageUploadController {
 		final String contentType = imageFile.getContentType();
 		if (contentType == null) {
 			result.reject("upload.mime-type.required", null);
-			return INDEX_TEMPLATE;
 		}
 		else if (!contentType.equalsIgnoreCase(imageInfo.getMimeType())) {
 			result.reject("upload.mime-type.mot.match",
 					new Object[] { imageFile.getContentType(), imageInfo.getMimeType() }, null);
+		}
+
+		if (result.hasErrors()) {
+			model.addAttribute("uploadSizeLimit", this.multipartProperties.getMaxFileSize().toMegabytes());
+			model.addAttribute("files", this.imageService.loadAll().map((path) -> path.getFileName().toString()).toList());
 			return INDEX_TEMPLATE;
 		}
 

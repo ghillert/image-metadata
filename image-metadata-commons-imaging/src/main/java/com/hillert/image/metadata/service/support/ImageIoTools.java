@@ -76,7 +76,7 @@ public final class ImageIoTools {
 		switch (mimeType) {
 			case MediaType.IMAGE_JPEG_VALUE -> {
 				imageWriteParam.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-				imageWriteParam.setCompressionQuality(1.0f);
+				imageWriteParam.setCompressionQuality(0.8f);
 			}
 		}
 

@@ -54,6 +54,7 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.util.StopWatch;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -206,6 +207,12 @@ public class DefaultImageService implements ImageService {
 	@Override
 	public byte[] resizeImage(BufferedImage bufferedImage, String label, Integer targetWidth, String mimeType) {
 
+		final BufferedImage outputBufferedImage = ImageIoTools.resizeImage(bufferedImage, targetWidth);
+
+		if (!StringUtils.hasText(label)) {
+			return ImageIoTools.writeImage(outputBufferedImage, mimeType);
+		}
+
 		final String fontName = "Montserrat-SemiBold.ttf";
 		final File tempDirFile;
 		try {
@@ -231,10 +238,6 @@ public class DefaultImageService implements ImageService {
 		catch (IOException ex) {
 			throw new IllegalStateException("Error creating font.", ex);
 		}
-
-		final BufferedImage outputBufferedImage = ImageIoTools.resizeImage(bufferedImage, targetWidth);
-
-		byte[] data = ImageIoTools.writeImage(outputBufferedImage, "image/png");
 
 		if (outputBufferedImage.getGraphics() instanceof Graphics2D graphics2D) {
 			setGraphicsQuality(graphics2D);

@@ -16,6 +16,7 @@
 package com.hillert.image.metadata.controller;
 
 import com.hillert.image.metadata.service.support.ImageProcessingException;
+import com.hillert.image.metadata.service.support.StorageException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,6 +43,12 @@ public class ExceptionHandling {
 		this.multipartProperties = multipartProperties;
 	}
 
+	@ExceptionHandler(StorageException.class)
+	public String storageExceptionErrorHandler(StorageException ex, RedirectAttributes redirectAttributes) {
+		redirectAttributes.addFlashAttribute("error", ex.getMessage());
+		return "redirect:/";
+	}
+
 	@ExceptionHandler(ImageProcessingException.class)
 	public String multipartErrorHandler(ImageProcessingException ex, RedirectAttributes redirectAttributes) {
 		redirectAttributes.addFlashAttribute("error", ex.getMessage());
@@ -61,5 +68,4 @@ public class ExceptionHandling {
 		redirectAttributes.addFlashAttribute("errorMessage", "An unexpected exception occured.");
 		return "redirect:/upload-error";
 	}
-
 }
