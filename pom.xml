@@ -69,7 +69,7 @@
 		<!-- plugin dependency versions -->
 
 		<dependency-check-maven.version>7.1.1</dependency-check-maven.version>
-		<checkstyle.version>10.6.0</checkstyle.version>
+		<checkstyle.version>10.12.6</checkstyle.version>
 		<maven-checkstyle-plugin.version>3.3.1</maven-checkstyle-plugin.version>
 		<maven-enforcer-plugin.version>3.4.1</maven-enforcer-plugin.version>
 		<native-maven-plugin.version>0.9.28</native-maven-plugin.version>
