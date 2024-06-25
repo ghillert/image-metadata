@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Gunnar Hillert.
+ * Copyright (c) 2023, 2024 Gunnar Hillert.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,9 +34,8 @@ import com.hillert.image.metadata.model.Metadata;
 import com.hillert.image.metadata.service.support.CommonUtils;
 import com.hillert.image.metadata.service.support.ImageProcessingException;
 import com.hillert.image.metadata.service.support.MetadataExtractor;
-import org.apache.commons.imaging.ImageReadException;
-import org.apache.commons.imaging.ImageWriteException;
 import org.apache.commons.imaging.Imaging;
+import org.apache.commons.imaging.ImagingException;
 import org.apache.commons.imaging.common.GenericImageMetadata;
 import org.apache.commons.imaging.common.ImageMetadata;
 import org.apache.commons.imaging.formats.gif.GifImageMetadata;
@@ -143,14 +142,14 @@ public class DefaultMetadataService implements MetadataService {
 		try (ByteArrayOutputStream os = new ByteArrayOutputStream();) {
 			switch (metadataType) {
 				case EXIF -> new ExifRewriter().removeExifMetadata(imageBytes, os);
-				case IPTC -> new JpegIptcRewriter().removeIPTC(imageBytes, os);
+				case IPTC -> new JpegIptcRewriter().removeIptc(imageBytes, os);
 				case XMP -> new JpegXmpRewriter().removeXmpXml(imageBytes, os);
 				default ->
 					throw new ImageProcessingException("Unsupported DirectoryType " + metadataType.getName(), null);
 			}
 			purgedImageData = os.toByteArray();
 		}
-		catch (ImageWriteException | IOException | ImageReadException ex) {
+		catch (IOException ex) {
 			throw new ImageProcessingException("Unable to purge Image metadata for " + metadataType.getName(), ex);
 		}
 		return purgedImageData;
@@ -215,11 +214,11 @@ public class DefaultMetadataService implements MetadataService {
 				outputSet = new TiffOutputSet();
 			}
 		}
-		catch (IOException | ImageReadException ex) {
-			throw new ImageProcessingException("Unable to get Image Metadata.", ex);
-		}
-		catch (ImageWriteException ex) {
+		catch (ImagingException ex) {
 			throw new ImageProcessingException("Unable to get EXIF Tags.", ex);
+		}
+		catch (IOException ex) {
+			throw new ImageProcessingException("Unable to get Image Metadata.", ex);
 		}
 
 		final byte[] modifiedImageData;
@@ -255,7 +254,7 @@ public class DefaultMetadataService implements MetadataService {
 			new ExifRewriter().updateExifMetadataLossless(imageBytes, os, outputSet);
 			modifiedImageData = os.toByteArray();
 		}
-		catch (ImageWriteException | IOException | ImageReadException ex) {
+		catch (IOException ex) {
 			throw new ImageProcessingException("Unable to populate Windows-specific EXIF Tags.", ex);
 		}
 		return modifiedImageData;
@@ -290,7 +289,7 @@ public class DefaultMetadataService implements MetadataService {
 				}
 			}
 		}
-		catch (IOException | ImageReadException ex) {
+		catch (IOException ex) {
 			throw new ImageProcessingException("Unable to get Image Metadata.", ex);
 		}
 
@@ -310,10 +309,10 @@ public class DefaultMetadataService implements MetadataService {
 				}
 			}
 			final PhotoshopApp13Data newData = new PhotoshopApp13Data(newRecords, newBlocks);
-			new JpegIptcRewriter().writeIPTC(imageBytes, os, newData);
+			new JpegIptcRewriter().writeIptc(imageBytes, os, newData);
 			modifiedImageData = os.toByteArray();
 		}
-		catch (ImageWriteException | IOException | ImageReadException ex) {
+		catch (IOException ex) {
 			throw new ImageProcessingException("Unable to populate reference id.", ex);
 		}
 		return modifiedImageData;
@@ -366,7 +365,7 @@ public class DefaultMetadataService implements MetadataService {
 			new JpegXmpRewriter().updateXmpXml(imageBytes, modifiedImageDataOutputStream, xmpAsString);
 			modifiedImageData = modifiedImageDataOutputStream.toByteArray();
 		}
-		catch (ImageReadException | IOException | ImageWriteException ex) {
+		catch (IOException ex) {
 			throw new ImageProcessingException("Unable to write XMP data to JPG.", ex);
 		}
 		return modifiedImageData;
@@ -377,7 +376,7 @@ public class DefaultMetadataService implements MetadataService {
 		try {
 			xmpString = Imaging.getXmpXml(imageBytes);
 		}
-		catch (ImageReadException ex) {
+		catch (ImagingException ex) {
 			throw new ImageProcessingException("Unable to parse the image.", ex);
 		}
 		catch (IOException ex) {

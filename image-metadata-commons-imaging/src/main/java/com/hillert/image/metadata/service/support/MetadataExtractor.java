@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Gunnar Hillert.
+ * Copyright (c) 2023, 2024 Gunnar Hillert.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package com.hillert.image.metadata.service.support;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringReader;
@@ -41,8 +42,8 @@ import com.hillert.image.metadata.model.Directory;
 import com.hillert.image.metadata.model.DirectoryType;
 import com.hillert.image.metadata.model.GnssInfo;
 import org.apache.commons.imaging.ImageInfo;
-import org.apache.commons.imaging.ImageReadException;
 import org.apache.commons.imaging.Imaging;
+import org.apache.commons.imaging.ImagingException;
 import org.apache.commons.imaging.common.GenericImageMetadata;
 import org.apache.commons.imaging.common.ImageMetadata;
 import org.apache.commons.imaging.common.RationalNumber;
@@ -123,7 +124,7 @@ public final class MetadataExtractor {
 		try {
 			xmpString = Imaging.getXmpXml(resource.getInputStream(), resource.getFilename());
 		}
-		catch (ImageReadException ex) {
+		catch (ImagingException ex) {
 			throw new ImageProcessingException("Unable to read image data.", ex);
 		}
 		catch (IOException ex) {
@@ -164,11 +165,11 @@ public final class MetadataExtractor {
 
 	public static ImageInfo loadImageInfo(byte[] imageBytes) {
 		final ImageInfo imageInfo;
-
+		//Imaging.getImageInfo(new File("/Users/hillert/Downloads/IMG_20240622_092040.jpg"));
 		try {
 			imageInfo = Imaging.getImageInfo(imageBytes);
 		}
-		catch (ImageReadException | IOException ex) {
+		catch (IOException ex) {
 			throw new IllegalStateException("Unable to read 'image info' of the provided image data.", ex);
 		}
 		return imageInfo;
@@ -224,7 +225,7 @@ public final class MetadataExtractor {
 		try {
 			metadata = Imaging.getMetadata(resource.getInputStream(), resource.getFilename());
 		}
-		catch (ImageReadException | IOException ex) {
+		catch (IOException ex) {
 			throw new IllegalStateException("Unable to parse the metadata of image file " + resource.getFilename(), ex);
 		}
 		return metadata;
@@ -310,12 +311,12 @@ public final class MetadataExtractor {
 
 		try {
 
-			if (jpegImageMetadata.getExif() == null || jpegImageMetadata.getExif().getGPS() == null) {
+			if (jpegImageMetadata.getExif() == null || jpegImageMetadata.getExif().getGpsInfo() == null) {
 				return null;
 			}
 
 			final TiffImageMetadata exifMetadata = jpegImageMetadata.getExif();
-			final TiffImageMetadata.GPSInfo gpsInfo = exifMetadata.getGPS();
+			final TiffImageMetadata.GpsInfo gpsInfo = exifMetadata.getGpsInfo();
 
 			final TiffField altitudeField = exifMetadata.findField(GpsTagConstants.GPS_TAG_GPS_ALTITUDE);
 			altitudeField.getDoubleValue();
@@ -342,7 +343,7 @@ public final class MetadataExtractor {
 			gnssInfo.setGnssTime(zonedDateTime);
 			return gnssInfo;
 		}
-		catch (ImageReadException ex) {
+		catch (ImagingException ex) {
 			throw new IllegalStateException("Unable to retrieve a Metadata value.", ex);
 		}
 	}
