@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Gunnar Hillert.
+ * Copyright (c) 2023, 2025 Gunnar Hillert.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,6 +40,7 @@ import org.xml.sax.SAXException;
 
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 /**
  * Contains common utilities for the project.
@@ -104,6 +105,10 @@ public final class CommonUtils {
 	}
 
 	public static String formatXml(String xml, Boolean ommitXmlDeclaration) {
+		if (!StringUtils.hasText(xml)) {
+			return "";
+		}
+
 		final DocumentBuilder db;
 		try {
 			db = DocumentBuilderFactory.newInstance().newDocumentBuilder();

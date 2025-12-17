@@ -27,7 +27,7 @@ import com.hillert.image.metadata.service.support.ImageLoaderType;
 import com.hillert.image.metadata.service.support.MetadataExtractor;
 import org.apache.commons.imaging.ImageInfo;
 
-import org.springframework.boot.autoconfigure.web.servlet.MultipartProperties;
+import org.springframework.boot.servlet.autoconfigure.MultipartProperties;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
