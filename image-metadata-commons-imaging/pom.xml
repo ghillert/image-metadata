@@ -34,11 +34,10 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-thymeleaf</artifactId>
 		</dependency>
-		<!-- This special version of thymeleaf-layout-dialect does not depend on Groovy -->
 		<dependency>
 			<groupId>com.github.zhanhb</groupId>
 			<artifactId>thymeleaf-layout-dialect</artifactId>
-			<version>3.2.1-SNAPSHOT</version>
+			<version>3.2.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
