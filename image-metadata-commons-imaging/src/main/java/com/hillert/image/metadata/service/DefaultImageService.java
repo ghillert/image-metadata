@@ -196,6 +196,11 @@ public class DefaultImageService implements ImageService {
 		try {
 			return Files.walk(this.rootLocation, 1)
 				.filter((path) -> !path.equals(this.rootLocation))
+				.filter(path -> {
+					Path fileName = path.getFileName();
+					return fileName == null
+							|| !fileName.toString().toLowerCase().endsWith(".txt");
+				})
 				.map(this.rootLocation::relativize);
 		}
 		catch (IOException ex) {
@@ -279,5 +284,6 @@ public class DefaultImageService implements ImageService {
 		g.translate(x, y);
 		label.paint(g);
 	}
+
 
 }
