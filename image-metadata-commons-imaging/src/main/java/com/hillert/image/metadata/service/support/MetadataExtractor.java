@@ -15,7 +15,6 @@
  */
 package com.hillert.image.metadata.service.support;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringReader;
