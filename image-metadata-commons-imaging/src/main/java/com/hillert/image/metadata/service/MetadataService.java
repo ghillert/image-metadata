@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Gunnar Hillert.
+ * Copyright (c) 2023, 2025 Gunnar Hillert.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -88,4 +88,13 @@ public interface MetadataService {
 	 */
 	byte[] updateMetadata(byte[] imageBytes, boolean populateWindowsTags, String referenceId, String caption);
 
+	/**
+	 * Retrieve the image description for a provided image {@link Resource}.
+	 * The image description will be retrieved using AI and then store as a text file in the same directory as the image
+	 * file. Therefore, multiple requests for the same image will return the same description. Delete the text file to
+	 * generate a new image description.
+	 * @param resource must not be null
+	 * @return the description for the provided image
+	 */
+	String getImageDescription(Resource resource);
 }

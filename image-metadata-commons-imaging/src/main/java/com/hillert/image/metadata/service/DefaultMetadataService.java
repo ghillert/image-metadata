@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, 2024 Gunnar Hillert.
+ * Copyright (c) 2023, 2025 Gunnar Hillert.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,10 @@ package com.hillert.image.metadata.service;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,6 +30,7 @@ import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.stream.StreamSource;
 
+import com.hillert.image.metadata.config.MetadataConfigProperties;
 import com.hillert.image.metadata.model.DirectoryType;
 import com.hillert.image.metadata.model.GnssInfo;
 import com.hillert.image.metadata.model.Metadata;
@@ -61,8 +64,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.ai.content.Media;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
+import org.springframework.util.MimeType;
 import org.springframework.util.StreamUtils;
 import org.springframework.util.StringUtils;
 
@@ -75,6 +82,20 @@ import org.springframework.util.StringUtils;
 public class DefaultMetadataService implements MetadataService {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DefaultMetadataService.class);
+
+	private final MetadataConfigProperties metadataConfigProperties;
+
+	private final ChatClient chatClient;
+
+	/**
+	 * Constructor.
+	 * @param metadataConfigProperties the {@link MetadataConfigProperties}
+	 * @param chatClientBuilder the ChatClient.Builder used to build the chatClient
+	 */
+	public DefaultMetadataService(MetadataConfigProperties metadataConfigProperties, ChatClient.Builder chatClientBuilder) {
+		this.metadataConfigProperties = metadataConfigProperties;
+		this.chatClient = chatClientBuilder.build();
+	}
 
 	@Override
 	public Metadata getExifData(Resource resource) {
@@ -184,6 +205,61 @@ public class DefaultMetadataService implements MetadataService {
 		resultImageBytes = populateXmpTags(resultImageBytes, xmpTagsToPopulate);
 
 		return resultImageBytes;
+	}
+
+	@Override
+	public String getImageDescription(Resource imageResource) {
+
+		if (!this.metadataConfigProperties.getAi().getCreateImageDescription()) {
+			return "Not activated.";
+		}
+
+		final String response;
+
+		try {
+
+			File textFile = getImageDescriptionFileLocation(imageResource);
+
+			if (textFile.exists()) {
+				response = Files.readString(textFile.toPath());
+			}
+			else {
+				UserMessage userMessage = UserMessage.builder()
+						.text(this.metadataConfigProperties.getAi().getTextPrompt())
+						.media(new Media(MimeType.valueOf("image/jpeg"), imageResource))
+						.build();
+
+				response = this.chatClient
+						.prompt()
+						.messages(userMessage)
+						.call()
+						.content();
+
+				java.nio.file.Files.writeString(
+						textFile.toPath(),
+						response,
+						java.nio.charset.StandardCharsets.UTF_8
+				);
+			}
+		}
+		catch (IOException ex) {
+			throw new ImageProcessingException("Unable to write description file for " + imageResource.getFilename(), ex);
+		}
+
+		return response;
+	}
+
+	private File getImageDescriptionFileLocation(Resource imageResource) throws IOException {
+		if (!imageResource.isFile()) {
+			throw new ImageProcessingException("Resource is not file-based: " + imageResource, null);
+		}
+
+		File imageFile = imageResource.getFile();
+		String imageName = imageFile.getName();
+
+		int dotIndex = imageName.lastIndexOf('.');
+		String baseName = (dotIndex > 0) ? imageName.substring(0, dotIndex) : imageName;
+		return new File(imageFile.getParentFile(), baseName + ".txt");
 	}
 
 	private byte[] populateExifTags(byte[] imageBytes, HashMap<String, String> exifTagsToPopulate) {

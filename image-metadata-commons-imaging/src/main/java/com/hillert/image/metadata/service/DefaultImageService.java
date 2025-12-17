@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Gunnar Hillert.
+ * Copyright (c) 2023, 2025 Gunnar Hillert.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -196,7 +196,7 @@ public class DefaultImageService implements ImageService {
 		try {
 			return Files.walk(this.rootLocation, 1)
 				.filter((path) -> !path.equals(this.rootLocation))
-				.filter(path -> {
+				.filter((path) -> {
 					Path fileName = path.getFileName();
 					return fileName == null
 							|| !fileName.toString().toLowerCase().endsWith(".txt");
