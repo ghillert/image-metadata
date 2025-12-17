@@ -116,7 +116,7 @@ public class ImageUploadController {
 			imageBytes = this.metadataService.purge(imageBytes, DirectoryType.XMP);
 		}
 
-		if (Boolean.TRUE.equals(imageUploadForm.isUpdateMetadataNeeded())) {
+		if (imageUploadForm.isUpdateMetadataNeeded()) {
 			imageBytes = this.metadataService.updateMetadata(imageBytes, imageUploadForm.getPopulateWindowsTags(),
 					imageUploadForm.getReferenceId(), imageUploadForm.getTitle());
 		}
