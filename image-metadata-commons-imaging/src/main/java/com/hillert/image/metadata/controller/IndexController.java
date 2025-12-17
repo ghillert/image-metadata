@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Gunnar Hillert.
+ * Copyright (c) 2023, 2025 Gunnar Hillert.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -82,7 +82,9 @@ public class IndexController {
 	@GetMapping({ "/image-details/{filename:.+}" })
 	public String getImageDetails(@PathVariable(name = "filename") String filename, Model model, TimeZone timezone) {
 
-		final Metadata metadata = this.metadataService.getExifData(this.imageService.loadAsResource(filename));
+		final Resource imageResource = this.imageService.loadAsResource(filename);
+
+		final Metadata metadata = this.metadataService.getExifData(imageResource);
 		metadata.setTimeZone(timezone.toZoneId());
 		model.addAttribute("filename", filename);
 
@@ -90,6 +92,8 @@ public class IndexController {
 		model.addAttribute("metadataCount", metadata.getDirectoryCount());
 		model.addAttribute("mapLocation", metadata.getGnssInfo());
 		model.addAttribute("xmpData", metadata.getXmpData());
+
+		model.addAttribute("imageDescription", this.metadataService.getImageDescription(imageResource));
 		return "imageDetails";
 	}
 

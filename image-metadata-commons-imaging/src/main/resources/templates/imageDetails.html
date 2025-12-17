@@ -60,6 +60,12 @@
 
 		<img class="img-thumbnail" th:src="@{'/images/' + ${filename} + '?width=500'}" th:alt="${filename}"/>
 
+		<h3>Image Description</h3>
+
+		<div th:text="${imageDescription}">
+			Description of the image.
+		</div>
+
 		<div>
 			<ul>
 				<li th:each="file : ${files}">
