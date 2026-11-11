@@ -284,7 +284,6 @@
 									<builder>paketobuildpacks/builder:full</builder>
 									<env>
 										<BP_NATIVE_IMAGE>true</BP_NATIVE_IMAGE>
-										<BP_NATIVE_IMAGE_BUILD_ARGUMENTS>--initialize-at-build-time=com.sun.beans.introspect.ClassInfo,java.beans.Introspector,com.sun.beans.finder.MethodFinder</BP_NATIVE_IMAGE_BUILD_ARGUMENTS>
 									</env>
 								</image>
 							</configuration>
@@ -316,11 +315,8 @@
 									<enabled>true</enabled>
 								</metadataRepository>
 								<requiredVersion>${graalvm.minimum.version}</requiredVersion>
-								<buildArgs>
-									<arg>--initialize-at-build-time=org.slf4j.LoggerFactory,ch.qos.logback</arg>
-									<arg>--trace-class-initialization=java.beans.Introspector,com.sun.beans.introspect.ClassInfo,com.sun.beans.finder.MethodFinder</arg>
-									<arg>--initialize-at-build-time=com.sun.beans.introspect.ClassInfo,java.beans.Introspector,com.sun.beans.finder.MethodFinder</arg>
-								</buildArgs>
+								<!-- Use library initialization defaults; forcing logging or JavaBeans to build time
+								     violates GraalVM 25's strict image-heap checks. -->
 							</configuration>
 							<executions>
 								<execution>

@@ -118,7 +118,11 @@
 },
 {
   "name":"sun.font.Font2D",
-  "methods":[{"name":"canDisplay","parameterTypes":["char"] }, {"name":"charToGlyph","parameterTypes":["int"] }, {"name":"charToVariationGlyph","parameterTypes":["int","int"] }, {"name":"getMapper","parameterTypes":[] }, {"name":"getTableBytes","parameterTypes":["int"] }]
+  "methods":[{"name":"canDisplay","parameterTypes":["char"] }, {"name":"charToGlyph","parameterTypes":["int"] }, {"name":"charToGlyphRaw","parameterTypes":["int"] }, {"name":"charToVariationGlyph","parameterTypes":["int","int"] }, {"name":"charToVariationGlyphRaw","parameterTypes":["int","int"] }, {"name":"getMapper","parameterTypes":[] }, {"name":"getTableBytes","parameterTypes":["int"] }]
+},
+{
+  "name":"sun.font.FontUtilities",
+  "methods":[{"name":"debugFonts","parameterTypes":[] }]
 },
 {
   "name":"sun.font.FontStrike",

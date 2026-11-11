@@ -115,9 +115,20 @@
                 <groupId>gg.jte</groupId><artifactId>jte-maven-plugin</artifactId><version>${jte.version}</version>
                 <configuration>
                     <sourceDirectory>${project.basedir}/src/main/jte</sourceDirectory>
-                    <targetDirectory>${project.build.outputDirectory}</targetDirectory><contentType>Html</contentType>
+                    <targetDirectory>${project.build.directory}/generated-sources/jte</targetDirectory>
+                    <targetResourceDirectory>${project.build.outputDirectory}</targetResourceDirectory>
+                    <contentType>Html</contentType>
+                    <extensions>
+                        <extension><className>gg.jte.nativeimage.NativeResourcesExtension</className></extension>
+                    </extensions>
                 </configuration>
-                <executions><execution><phase>process-classes</phase><goals><goal>precompile</goal></goals></execution></executions>
+                <!-- The generate goal supports extensions; javac compiles the generated templates. -->
+                <executions><execution><phase>generate-sources</phase><goals><goal>generate</goal></goals></execution></executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>gg.jte</groupId><artifactId>jte-native-resources</artifactId><version>${jte.version}</version>
+                    </dependency>
+                </dependencies>
             </plugin>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>

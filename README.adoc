@@ -103,27 +103,9 @@ TIP: Use https://sdkman.io/[SDKMAN!] to install any version of Java.
 
 Spring Boot 4.1 requires https://docs.spring.io/spring-boot/system-requirements.html[GraalVM 25 or later].
 
-For the native compilation support, you will need a https://www.graalvm.org/[GraalVM] based implementation of Java. As
-this application uses AWT classes, Bellsoft's https://bell-sw.com/liberica-native-image-kit/[Liberica Native Image Kit] (NIK)
-is currently (as of Oct 24, 2023) the best implementation. The following version was used for testing:
-
-- https://bell-sw.com/pages/downloads/native-image-kit/[BellSoft 23.1.r21-nik]
-
-[NOTE]
-====
-Oracle GraalVM does not work on *MacOS*, yet. You will encounter a `No awt in java.library.path`. See
-https://github.com/oracle/graal/issues/4124 for details.
-
-If you try, you will see an exception like the following:
-
-[source,bash,indent=0,subs=attributes]
-----
-2023-02-12T09:38:34.721-10:00 ERROR 65901 --- [nio-8080-exec-8] o.a.c.c.C.[.[.[/].[dispatcherServlet]    : Servlet.service() for servlet [dispatcherServlet] in context with path [] threw exception [Handler dispatch failed: java.lang.UnsatisfiedLinkError: no awt in java.library.path] with root cause
-
-java.lang.UnsatisfiedLinkError: no awt in java.library.path
-...
-----
-====
+The native build has been verified with Oracle GraalVM `25.4.4.1+1-graal` on macOS Apple Silicon.
+Select that JDK with SDKMAN before building, or point `JAVA_HOME` to its installation.
+Image processing uses AWT and native libraries; see the platform notes below when distributing the executable.
 
 TIP: Use https://sdkman.io/[SDKMAN!] to install GraalVM.
 
@@ -174,15 +156,16 @@ for details.
 
 *IMPORTANT*
 
-When using AWT and ImageIO classes etc. the native GraalVM Native Image metadata seems to be specific to the relevant platform.
-Therefore, you may need to rename the respective folder under
-`image-metadata-commons-imaging/src/main/resource/META-INF` to `native-image`. I provide the following folders:
+AWT and ImageIO native-image metadata can depend on the JDK version and platform.
+For reference, `image-metadata-commons-imaging/src/main/resources/META-INF` contains the following platform snapshots:
 
 - native-image-linux
 - native-image-mac
 - native-image-windows
 
-Alternatively, you can run the *native-image-agent* as described under *Development* below.
+These platform folders are historical snapshots. The active `native-image` folder includes JDK 25 font JNI updates;
+do not replace it with an older snapshot without collecting and validating fresh metadata.
+You can run the *native-image-agent* as described under *Development* below.
 
 === Creating a Local Native Image
 
@@ -205,6 +188,12 @@ So you can also use:
 ./mvnw clean package -Pnative,nativeCompile
 ----
 
+The native profile uses the libraries' default class-initialization settings. Forcing SLF4J, Logback, or JavaBeans
+classes to initialize at build time fails GraalVM 25's strict image-heap checks (for example,
+`SubstituteServiceProvider` or `ClassInfo$1` in the image heap).
+JTE's `generate` goal runs `NativeResourcesExtension` to register the compiled templates for reflection.
+The Java compiler then compiles those generated sources along with the application.
+
 The result (if successful) will be an executable binary at: `image-metadata-commons-imaging/target/image-metadata-commons-imaging`
 
 TIP: You can use https://upx.github.io/[Ultimate Packer for eXecutables] (UPX) to further compress the binary. E.g.
@@ -215,11 +204,24 @@ for details.
 
 ==== macOS
 
-As the application uses some AWT classes for image processing, the native version for macOS will not run using Oracle
-GraalVM. There is an https://github.com/oracle/graal/issues/4124[open GitHub issue] at the GraalVM project.
+Oracle GraalVM `25.4.4.1+1-graal` builds the application on macOS Apple Silicon and copies the required `.dylib`
+files into `target` beside the executable. Keep these libraries alongside the executable when moving it.
+Native smoke checks pass for startup, JTE pages, static assets, upload, metadata details, and image resizing with
+`addLabel=false`. This does not establish full AWT/Swing compatibility on macOS.
 
-However, compilation will succeed and the application will run when using
-https://bell-sw.com/pages/downloads/native-image-kit/[Liberica Native Image Kit] (NIK).
+JDK 25 font rendering needs JNI registrations for `Font2D.charToGlyphRaw`, `Font2D.charToVariationGlyphRaw`, and
+`FontUtilities.debugFonts`. These are included in the active `META-INF/native-image/jni-config.json`.
+Without them, adding a filename label to an image can fail with `NoSuchMethodError` even though compilation succeeds.
+
+[WARNING]
+====
+Labeled image rendering remains limited on macOS with this GraalVM version. Without `java.home`, font initialization
+fails with `java.home property not set`. Supplying the GraalVM JDK as `java.home` gets past font initialization,
+but the current Swing `JLabel` renderer then blocks in `LWCToolkit_getMultiClickTime`, waiting on the macOS main thread.
+This was reproduced with a native request and confirmed with a process stack sample. Use the JVM application for
+labeled images; native previews and resizing work with `addLabel=false`. Download links currently enable labels
+by default and are affected as well.
+====
 
 [source,bash]
 ----
@@ -318,7 +320,7 @@ into the application. CSS and JavaScript are served locally, with no runtime CDN
 The GPS map uses OpenStreetMap tiles and requires an internet connection.
 
 `./mvnw clean verify` installs a pinned, project-local Node runtime, runs `npm ci`, builds
-assets into `target/frontend`, and precompiles JTE templates. No global Node installation
+assets into `target/frontend`, and generates and compiles JTE templates with their native-image metadata. No global Node installation
 is required. The frontend package and lockfile live in `image-metadata-commons-imaging`.
 All Maven dependency and plugin versions remain properties in the parent POM.
 
