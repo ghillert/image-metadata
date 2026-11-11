@@ -63,24 +63,38 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-		<maven.minimum.version>3.8.6</maven.minimum.version>
+		<maven.minimum.version>3.9.0</maven.minimum.version>
+		<graalvm.minimum.version>25</graalvm.minimum.version>
 		<sonar.moduleKey>${project.artifactId}</sonar.moduleKey>
 
 		<!-- plugin dependency versions -->
 
-		<dependency-check-maven.version>7.1.1</dependency-check-maven.version>
-		<checkstyle.version>10.17.0</checkstyle.version>
+		<dependency-check-maven.version>13.0.0</dependency-check-maven.version>
+		<!-- Checkstyle 13 and later require Java 21. -->
+		<checkstyle.version>12.3.1</checkstyle.version>
 		<maven-checkstyle-plugin.version>3.6.0</maven-checkstyle-plugin.version>
-		<maven-enforcer-plugin.version>3.6.2</maven-enforcer-plugin.version>
-		<native-maven-plugin.version>0.11.3</native-maven-plugin.version>
-		<spring-javaformat-checkstyle.version>0.0.47</spring-javaformat-checkstyle.version>
-		<versions-maven-plugin.version>2.20.1</versions-maven-plugin.version>
+		<maven-clean-plugin.version>3.5.0</maven-clean-plugin.version>
+		<maven-compiler-plugin.version>3.16.0</maven-compiler-plugin.version>
+		<maven-deploy-plugin.version>3.2.0</maven-deploy-plugin.version>
+		<maven-enforcer-plugin.version>3.7.0</maven-enforcer-plugin.version>
+		<maven-install-plugin.version>3.2.0</maven-install-plugin.version>
+		<maven-jar-plugin.version>3.5.1</maven-jar-plugin.version>
+		<maven-resources-plugin.version>3.5.0</maven-resources-plugin.version>
+		<maven-surefire-plugin.version>3.6.1</maven-surefire-plugin.version>
+		<native-maven-plugin.version>1.1.18</native-maven-plugin.version>
+		<spring-javaformat-checkstyle.version>0.0.48</spring-javaformat-checkstyle.version>
+		<versions-maven-plugin.version>2.25.1</versions-maven-plugin.version>
 
 		<!-- main dependency versions -->
-		<apache-commons-imaging.version>1.0.0-alpha5</apache-commons-imaging.version>
-		<apache-xmlgraphics-commons.version>2.9</apache-xmlgraphics-commons.version>
-		<imagej.version>1.54d</imagej.version>
-		<spring-boot.version>4.0.0</spring-boot.version>
+		<apache-commons-imaging.version>1.0.0-alpha6</apache-commons-imaging.version>
+		<apache-xmlgraphics-commons.version>2.12</apache-xmlgraphics-commons.version>
+		<assertj.version>3.27.7</assertj.version>
+		<image-filters-4j.version>1.0.0-SNAPSHOT</image-filters-4j.version>
+		<imagej.version>1.54p</imagej.version>
+		<spring-ai.version>2.0.2</spring-ai.version>
+		<spring-boot.version>4.1.2</spring-boot.version>
+		<thymeleaf-layout-dialect.version>3.2.0</thymeleaf-layout-dialect.version>
+		<twelvemonkeys.version>3.15.3</twelvemonkeys.version>
 		<xerces.version>2.12.2</xerces.version>
 	</properties>
 
@@ -97,7 +111,7 @@
 		</repository>
 		<repository>
 			<id>snapshots-repo</id>
-			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+			<url>https://central.sonatype.com/repository/maven-snapshots</url>
 			<releases>
 				<enabled>false</enabled>
 			</releases>
@@ -114,6 +128,36 @@
 	<build>
 		<pluginManagement>
 			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-clean-plugin</artifactId>
+					<version>${maven-clean-plugin.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-deploy-plugin</artifactId>
+					<version>${maven-deploy-plugin.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-install-plugin</artifactId>
+					<version>${maven-install-plugin.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-jar-plugin</artifactId>
+					<version>${maven-jar-plugin.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-resources-plugin</artifactId>
+					<version>${maven-resources-plugin.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<version>${maven-surefire-plugin.version}</version>
+				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-checkstyle-plugin</artifactId>
@@ -170,6 +214,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
+					<version>${maven-compiler-plugin.version}</version>
 					<configuration>
 						<compilerArgument>-Xlint:all,-processing</compilerArgument>
 						<showWarnings>true</showWarnings>
@@ -211,7 +256,7 @@
 			<dependency>
 				<groupId>org.springframework.ai</groupId>
 				<artifactId>spring-ai-bom</artifactId>
-				<version>2.0.0-M1</version>
+				<version>${spring-ai.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -268,7 +313,7 @@
 								<metadataRepository>
 									<enabled>true</enabled>
 								</metadataRepository>
-								<requiredVersion>22.3</requiredVersion>
+								<requiredVersion>${graalvm.minimum.version}</requiredVersion>
 								<buildArgs>
 									<arg>--initialize-at-build-time=org.slf4j.LoggerFactory,ch.qos.logback</arg>
 									<arg>--trace-class-initialization=java.beans.Introspector,com.sun.beans.introspect.ClassInfo,com.sun.beans.finder.MethodFinder</arg>

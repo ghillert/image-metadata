@@ -101,6 +101,8 @@ TIP: Use https://sdkman.io/[SDKMAN!] to install any version of Java.
 
 ==== Native Compilation:
 
+Spring Boot 4.1 requires https://docs.spring.io/spring-boot/system-requirements.html[GraalVM 25 or later].
+
 For the native compilation support, you will need a https://www.graalvm.org/[GraalVM] based implementation of Java. As
 this application uses AWT classes, Bellsoft's https://bell-sw.com/liberica-native-image-kit/[Liberica Native Image Kit] (NIK)
 is currently (as of Oct 24, 2023) the best implementation. The following version was used for testing:
@@ -303,7 +305,7 @@ java -Dspring.aot.enabled=true \
 -agentlib:native-image-agent=config-output-dir=image-metadata-commons-imaging/src/main/resources/META-INF/native-image \
 -jar image-metadata-commons-imaging/target/image-metadata-commons-imaging-{current-version}.jar
 ----
-
+\
 == License
 
 Image Metadata is licensed under the link:LICENSE[Apache License] (ASL), Version 2.0.

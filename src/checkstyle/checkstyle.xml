@@ -17,4 +17,9 @@
         <property name="excludes" value="io.spring.javaformat.checkstyle.check.SpringHideUtilityClassConstructor" />
         <property name="excludes" value="com.puppycrawl.tools.checkstyle.checks.regexp.RegexpSinglelineJavaCheck" />
     </module>
+    <module name="TreeWalker">
+        <module name="CatchParameterName">
+            <property name="format" value="^(?:ex|_)$" />
+        </module>
+    </module>
 </module>

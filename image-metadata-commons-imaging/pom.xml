@@ -37,7 +37,7 @@
 		<dependency>
 			<groupId>com.github.zhanhb</groupId>
 			<artifactId>thymeleaf-layout-dialect</artifactId>
-			<version>3.2.0</version>
+			<version>${thymeleaf-layout-dialect.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -72,7 +72,7 @@
 		<dependency>
 			<groupId>com.twelvemonkeys.common</groupId>
 			<artifactId>common-image</artifactId>
-			<version>3.10.1</version>
+			<version>${twelvemonkeys.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>xerces</groupId>
@@ -83,13 +83,19 @@
 		<dependency>
 			<groupId>org.assertj</groupId>
 			<artifactId>assertj-core</artifactId>
-			<version>3.26.0</version>
+			<version>${assertj.version}</version>
 			<scope>test</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-starter-model-openai</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.hillert</groupId>
+			<artifactId>image-filters-4j</artifactId>
+			<version>${image-filters-4j.version}</version>
 		</dependency>
 	</dependencies>
 	<build>
