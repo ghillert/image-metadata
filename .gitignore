@@ -29,3 +29,6 @@ target/
 .DS_Store
 .project
 .settings
+# Frontend dependencies and generated templates
+node_modules/
+jte-classes/

@@ -26,6 +26,8 @@ import com.hillert.image.metadata.service.MetadataService;
 import com.hillert.image.metadata.service.support.ImageLoaderType;
 import com.hillert.image.metadata.service.support.MetadataExtractor;
 import org.apache.commons.imaging.ImageInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.springframework.boot.servlet.autoconfigure.MultipartProperties;
 import org.springframework.core.io.ByteArrayResource;
@@ -50,6 +52,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class IndexController {
 
 	private static final String INDEX_TEMPLATE = "index";
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(IndexController.class);
 
 	private final ImageService imageService;
 
@@ -93,7 +97,13 @@ public class IndexController {
 		model.addAttribute("mapLocation", metadata.getGnssInfo());
 		model.addAttribute("xmpData", metadata.getXmpData());
 
-		model.addAttribute("imageDescription", this.metadataService.getImageDescription(imageResource));
+		try {
+			model.addAttribute("imageDescription", this.metadataService.getImageDescription(imageResource));
+		}
+		catch (RuntimeException ex) {
+			LOGGER.warn("Unable to generate image description for {}", filename, ex);
+			model.addAttribute("imageDescriptionUnavailable", true);
+		}
 		return "imageDetails";
 	}
 

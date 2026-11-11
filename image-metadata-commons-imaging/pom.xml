@@ -31,13 +31,9 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-thymeleaf</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.github.zhanhb</groupId>
-			<artifactId>thymeleaf-layout-dialect</artifactId>
-			<version>${thymeleaf-layout-dialect.version}</version>
+			<groupId>gg.jte</groupId>
+			<artifactId>jte-spring-boot-starter-4</artifactId>
+			<version>${jte.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -99,7 +95,30 @@
 		</dependency>
 	</dependencies>
 	<build>
+        <resources>
+            <resource><directory>src/main/resources</directory></resource>
+            <resource><directory>${project.build.directory}/frontend</directory><targetPath>static</targetPath></resource>
+        </resources>
 		<plugins>
+            <plugin>
+                <groupId>com.github.eirslett</groupId>
+                <artifactId>frontend-maven-plugin</artifactId>
+                <version>${frontend-maven-plugin.version}</version>
+                <configuration><nodeVersion>${node.version}</nodeVersion><installDirectory>${project.build.directory}</installDirectory></configuration>
+                <executions>
+                    <execution><id>install-node</id><goals><goal>install-node-and-npm</goal></goals></execution>
+                    <execution><id>npm-ci</id><goals><goal>npm</goal></goals><configuration><arguments>ci --no-audit --no-fund</arguments></configuration></execution>
+                    <execution><id>frontend-build</id><goals><goal>npm</goal></goals><configuration><arguments>run build</arguments></configuration></execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>gg.jte</groupId><artifactId>jte-maven-plugin</artifactId><version>${jte.version}</version>
+                <configuration>
+                    <sourceDirectory>${project.basedir}/src/main/jte</sourceDirectory>
+                    <targetDirectory>${project.build.outputDirectory}</targetDirectory><contentType>Html</contentType>
+                </configuration>
+                <executions><execution><phase>process-classes</phase><goals><goal>precompile</goal></goals></execution></executions>
+            </plugin>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>

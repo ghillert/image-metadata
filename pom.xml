@@ -93,7 +93,9 @@
 		<imagej.version>1.54p</imagej.version>
 		<spring-ai.version>2.0.2</spring-ai.version>
 		<spring-boot.version>4.1.2</spring-boot.version>
-		<thymeleaf-layout-dialect.version>3.2.0</thymeleaf-layout-dialect.version>
+		<jte.version>3.2.5</jte.version>
+		<frontend-maven-plugin.version>2.0.2</frontend-maven-plugin.version>
+		<node.version>v24.21.0</node.version>
 		<twelvemonkeys.version>3.15.3</twelvemonkeys.version>
 		<xerces.version>2.12.2</xerces.version>
 	</properties>

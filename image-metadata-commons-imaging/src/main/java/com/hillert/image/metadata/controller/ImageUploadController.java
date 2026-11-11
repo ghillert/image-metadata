@@ -76,6 +76,9 @@ public class ImageUploadController {
 		StopWatch stopWatch = new StopWatch();
 		stopWatch.start();
 		if (result.hasErrors()) {
+			model.addAttribute("validationErrors", result.getAllErrors().stream()
+				.map((error) -> (error.getDefaultMessage() != null) ? error.getDefaultMessage()
+						: "Please check the image file type and try again.").toList());
 			model.addAttribute("uploadSizeLimit", this.multipartProperties.getMaxFileSize().toMegabytes());
 			model.addAttribute("files", this.imageService.loadAll().map((path) -> path.getFileName().toString()).toList());
 			return INDEX_TEMPLATE;
@@ -105,6 +108,9 @@ public class ImageUploadController {
 		}
 
 		if (result.hasErrors()) {
+			model.addAttribute("validationErrors", result.getAllErrors().stream()
+				.map((error) -> (error.getDefaultMessage() != null) ? error.getDefaultMessage()
+						: "Please check the image file type and try again.").toList());
 			model.addAttribute("uploadSizeLimit", this.multipartProperties.getMaxFileSize().toMegabytes());
 			model.addAttribute("files", this.imageService.loadAll().map((path) -> path.getFileName().toString()).toList());
 			return INDEX_TEMPLATE;

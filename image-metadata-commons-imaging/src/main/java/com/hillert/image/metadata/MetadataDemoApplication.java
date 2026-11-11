@@ -17,7 +17,6 @@ package com.hillert.image.metadata;
 
 import com.hillert.image.metadata.config.StorageConfigProperties;
 import com.hillert.image.metadata.service.ImageService;
-import nz.net.ultraq.thymeleaf.layoutdialect.LayoutDialect;
 
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -51,9 +50,5 @@ public class MetadataDemoApplication {
 		};
 	}
 
-	@Bean
-	public LayoutDialect layoutDialect() {
-		return new LayoutDialect();
-	}
 
 }

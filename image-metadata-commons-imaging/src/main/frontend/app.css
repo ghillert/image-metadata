@@ -1,0 +1,20 @@
+:root { --tblr-primary: #206bc4; }
+body { background: #f5f7fb; }
+.brand-mark { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 10px; background: #206bc4; color: white; font-size: 22px; }
+.page-header { padding-top: 2.5rem; }
+.page-title { font-size: clamp(1.6rem, 4vw, 2.2rem); letter-spacing: -.035em; }
+.upload-zone { border: 2px dashed #bdcde1; border-radius: 12px; background: #f8faff; padding: 2rem; text-align: center; }
+.image-preview { width: 100%; height: 220px; object-fit: contain; background: #eef2f7; }
+.detail-preview { width: 100%; max-height: 520px; object-fit: contain; background: #eef2f7; border-radius: 8px; }
+.metadata-table { table-layout: fixed; }
+.metadata-table th { width: 35%; }
+.metadata-table td, .metadata-table th { overflow-wrap: anywhere; white-space: normal; }
+.filename { overflow-wrap: anywhere; }
+.map-panel { height: 320px; border-radius: 8px; }
+.skip-link { position: absolute; left: -9999px; }
+.skip-link:focus { left: 1rem; top: 1rem; z-index: 2000; background: white; padding: 1rem; }
+pre { max-height: 460px; overflow: auto; }
+.card { box-shadow: 0 2px 4px #18243304; }
+@media (max-width: 575px) { .upload-zone { padding: 1rem; } .page-header { padding-top: 1.5rem; } }
+
+.page-wrapper > .container-xl { padding-inline: 1rem; }

@@ -309,3 +309,30 @@ java -Dspring.aot.enabled=true \
 == License
 
 Image Metadata is licensed under the link:LICENSE[Apache License] (ASL), Version 2.0.
+
+== UI development
+
+The UI uses Tabler components and typed JTE templates. Like Pembana, frontend assets are
+bundled with npm and Webpack; like Pembana Rain Gauge, shared JTE layouts are precompiled
+into the application. CSS and JavaScript are served locally, with no runtime CDN dependency.
+The GPS map uses OpenStreetMap tiles and requires an internet connection.
+
+`./mvnw clean verify` installs a pinned, project-local Node runtime, runs `npm ci`, builds
+assets into `target/frontend`, and precompiles JTE templates. No global Node installation
+is required. The frontend package and lockfile live in `image-metadata-commons-imaging`.
+All Maven dependency and plugin versions remain properties in the parent POM.
+
+For frontend-only iteration, run `npm ci` and `npm run watch` from that module using Node 24.
+After rebuilding, run `./mvnw process-resources` from the module to copy the assets into
+the application classpath. Templates are in `src/main/jte`; frontend sources are in
+`src/main/frontend`. Generated assets and node_modules are excluded from Git.
+
+To run the app, first package it, then use:
+
+[source,bash]
+----
+java -jar image-metadata-commons-imaging/target/image-metadata-commons-imaging-1.0.0-SNAPSHOT.jar
+----
+
+JTE uses precompiled templates by default, including tests and packaged runs. Template
+changes require rebuilding. Existing image processing and AI configuration still apply.
