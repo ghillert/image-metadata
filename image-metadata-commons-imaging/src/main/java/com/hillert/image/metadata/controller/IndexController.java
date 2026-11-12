@@ -19,6 +19,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.TimeZone;
 
+import com.hillert.image.metadata.config.MetadataConfigProperties;
 import com.hillert.image.metadata.controller.form.ImageUploadForm;
 import com.hillert.image.metadata.model.Metadata;
 import com.hillert.image.metadata.service.ImageService;
@@ -61,11 +62,16 @@ public class IndexController {
 
 	private final MultipartProperties multipartProperties;
 
+	private final MetadataConfigProperties metadataConfigProperties;
+
+	private volatile boolean imageProcessingAvailable = true;
+
 	public IndexController(ImageService imageService, MetadataService metadataService,
-			MultipartProperties multipartProperties) {
+			MultipartProperties multipartProperties, MetadataConfigProperties metadataConfigProperties) {
 		this.imageService = imageService;
 		this.metadataService = metadataService;
 		this.multipartProperties = multipartProperties;
+		this.metadataConfigProperties = metadataConfigProperties;
 	}
 
 	@GetMapping({ "/" })
@@ -116,35 +122,29 @@ public class IndexController {
 			@RequestParam(name = "download", required = false, defaultValue = "false") boolean download)
 			throws IOException {
 		final Resource file = this.imageService.loadAsResource(filename);
-		byte[] imageBytes = null;
-		imageLoaderType = ImageLoaderType.IMAGE_IO;
 		final ImageInfo imageInfo = MetadataExtractor.loadImageInfo(file.getContentAsByteArray());
-
-		final BufferedImage bufferedImage = this.imageService.loadAsBufferedImage(file, imageLoaderType,
-				imageInfo.getMimeType());
-
-		final String label;
-
-		if (addLabel) {
-			label = filename;
+		Resource responseFile = file;
+		if (!Boolean.TRUE.equals(this.metadataConfigProperties.getDoNotResize()) && this.imageProcessingAvailable) {
+			try {
+				final BufferedImage bufferedImage = this.imageService.loadAsBufferedImage(file, ImageLoaderType.IMAGE_IO,
+						imageInfo.getMimeType());
+				final String label = addLabel ? filename : null;
+				responseFile = new ByteArrayResource(
+						this.imageService.resizeImage(bufferedImage, label, width, imageInfo.getMimeType()));
+			}
+			catch (UnsatisfiedLinkError | NoClassDefFoundError ex) {
+				// A failed AWT class initialization cannot recover without restarting the process.
+				this.imageProcessingAvailable = false;
+				LOGGER.warn("Image processing is unavailable; serving stored images without resizing or labels.", ex);
+			}
 		}
-		else {
-			label = null;
-		}
 
-		imageBytes = this.imageService.resizeImage(bufferedImage, label, width, imageInfo.getMimeType());
-
-		final ByteArrayResource byteArrayResource = new ByteArrayResource(imageBytes);
+		ResponseEntity.BodyBuilder response = ResponseEntity.ok()
+			.contentType(MediaType.parseMediaType(imageInfo.getMimeType()));
 		if (download) {
-			return ResponseEntity.ok()
-				.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
-				.body(byteArrayResource);
+			response.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"");
 		}
-		else {
-			return ResponseEntity.ok()
-				.contentType(MediaType.parseMediaType(imageInfo.getMimeType()))
-				.body(byteArrayResource);
-		}
+		return response.body(responseFile);
 	}
 
 }

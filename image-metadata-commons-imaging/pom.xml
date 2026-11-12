@@ -30,6 +30,13 @@
 	</dependencyManagement>
 
 	<dependencies>
+		<!-- Compile-only annotations for the NIK macOS native-library workaround. -->
+		<dependency>
+			<groupId>org.graalvm.sdk</groupId>
+			<artifactId>nativeimage</artifactId>
+			<version>${graalvm-sdk.version}</version>
+			<scope>provided</scope>
+		</dependency>
 		<dependency>
 			<groupId>gg.jte</groupId>
 			<artifactId>jte-spring-boot-starter-4</artifactId>
@@ -149,4 +156,28 @@
 			</plugin>
 		</plugins>
 	</build>
+	<profiles>
+		<profile>
+			<id>liberica-nik-25-macos-awt</id>
+			<activation>
+				<jdk>[25,26)</jdk>
+				<os><family>mac</family></os>
+				<property><name>java.vendor</name><value>BellSoft</value></property>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.graalvm.buildtools</groupId>
+						<artifactId>native-maven-plugin</artifactId>
+						<configuration>
+							<buildArgs combine.children="append">
+								<!-- NIK links this toolkit statically but omits its initializer from the builtin map. -->
+								<buildArg>-H:NativeLinkerOption=-Wl,-exported_symbol,_JNI_OnLoad_awt_lwawt</buildArg>
+							</buildArgs>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>

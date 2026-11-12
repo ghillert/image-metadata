@@ -103,7 +103,9 @@ TIP: Use https://sdkman.io/[SDKMAN!] to install any version of Java.
 
 Spring Boot 4.1 requires https://docs.spring.io/spring-boot/system-requirements.html[GraalVM 25 or later].
 
-The native build has been verified with Oracle GraalVM `25.4.4.1+1-graal` on macOS Apple Silicon.
+The native build, image resizing, and filename labels have been verified with Liberica NIK
+`25.0.5.0+3.1-nik` on macOS Apple Silicon. Oracle GraalVM `25.4.4.1+1-graal` also compiles the application,
+but has additional font/Swing runtime limitations described below.
 Select that JDK with SDKMAN before building, or point `JAVA_HOME` to its installation.
 Image processing uses AWT and native libraries; see the platform notes below when distributing the executable.
 
@@ -204,6 +206,34 @@ for details.
 
 ==== macOS
 
+Liberica NIK `25.0.5.0+3.1-nik` supports both resizing and the Swing filename labels in this application.
+Use NIK as `JAVA_HOME` when invoking Maven (for example, `sdk use java 25.0.5.0+3.1-nik`), then run:
+
+[source,bash]
+----
+./mvnw clean package -DnativeCompile
+python3 scripts/check-native-images.py image-metadata-commons-imaging/target/image-metadata-commons-imaging
+----
+
+The smoke check starts the executable on a temporary loopback port with isolated upload storage and AI disabled.
+It uploads a JPEG, checks 200- and 800-pixel output dimensions, and checks that filename labels change the images.
+Serving the original file as a fallback fails this check. No external service or Python package is required.
+
+NIK 25 has a macOS AWT loading regression: it links `awt_lwawt` statically, but `JVM_IsStaticallyLinked()`
+returns false. The https://github.com/openjdk/jdk25u/blob/master/src/java.desktop/unix/native/libawt/awt/awt_LoadLibrary.c[AWT loader]
+then tries to open a nonexistent `libawt_lwawt.dylib` beside the executable.
+The matching loading failure is reported in https://github.com/bell-sw/LibericaNIK/issues/38[LibericaNIK issue #38].
+`LibericaMacAwtLibraries` routes that specific request through Native Image's built-in library loader.
+The automatically activated `liberica-nik-25-macos-awt` Maven profile retains and exports
+`JNI_OnLoad_awt_lwawt`, which NIK otherwise omits from its built-in initializer map.
+The substitution is restricted to NIK 25 on macOS; the linker profile requires macOS, BellSoft, and JDK 25.
+This does not modify the installed JDK or require copying its shared libraries beside the executable.
+Recheck whether this compatibility workaround is needed when upgrading NIK.
+
+Resizing and labels are enabled by default (`metadata.do-not-resize=false`). Setting it to `true` serves stored
+images directly. If a native library or image-processing class cannot load, the endpoint logs a warning and serves
+stored images for the rest of that process; this fallback preserves availability but does not resize or label images.
+
 Oracle GraalVM `25.4.4.1+1-graal` builds the application on macOS Apple Silicon and copies the required `.dylib`
 files into `target` beside the executable. Keep these libraries alongside the executable when moving it.
 Native smoke checks pass for startup, JTE pages, static assets, upload, metadata details, and image resizing with
@@ -215,12 +245,12 @@ Without them, adding a filename label to an image can fail with `NoSuchMethodErr
 
 [WARNING]
 ====
-Labeled image rendering remains limited on macOS with this GraalVM version. Without `java.home`, font initialization
+Labeled image rendering remains limited on macOS with this Oracle GraalVM version. Without `java.home`, font initialization
 fails with `java.home property not set`. Supplying the GraalVM JDK as `java.home` gets past font initialization,
 but the current Swing `JLabel` renderer then blocks in `LWCToolkit_getMultiClickTime`, waiting on the macOS main thread.
 This was reproduced with a native request and confirmed with a process stack sample. Use the JVM application for
-labeled images; native previews and resizing work with `addLabel=false`. Download links currently enable labels
-by default and are affected as well.
+labeled images or use the verified Liberica NIK build. Oracle native resizing works with `addLabel=false`;
+labeling still has the limitation above.
 ====
 
 [source,bash]
