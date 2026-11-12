@@ -368,3 +368,19 @@ java -jar image-metadata-commons-imaging/target/image-metadata-commons-imaging-1
 
 JTE uses precompiled templates by default, including tests and packaged runs. Template
 changes require rebuilding. Existing image processing and AI configuration still apply.
+
+== Optional AI image descriptions
+
+The application starts without an OpenAI API key. Missing or blank keys disable AI image descriptions;
+upload, previews, metadata inspection, and editing remain available. The details page displays
+"Image descriptions are disabled." No OpenAI clients or Spring AI auto-configurations are started in this mode.
+
+To enable descriptions, set `OPENAI_API_KEY` (or `spring.ai.openai.api-key`) and leave
+`metadata.ai.create-image-description=true`. Set that flag to `false` to disable AI even when a key is present.
+The application creates only the chat client it needs; it does not auto-configure embedding, audio, or image-generation models.
+Configuration is evaluated at application startup, including native execution, so a key is not required when building.
+
+Use `spring.ai.openai.chat.model` to choose the chat model. The older `spring.ai.openai.chat.options.model`
+setting remains supported. Chat-specific `api-key` and `base-url` settings override their common OpenAI equivalents.
+If an enabled AI service fails during a request, the details page retains the metadata and shows the existing
+description-unavailable message.

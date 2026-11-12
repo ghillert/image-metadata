@@ -21,7 +21,8 @@ import org.springframework.test.context.DynamicPropertySource;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT,
-		properties = "spring.ai.openai.api-key=test-api-key")
+		properties = { "spring.ai.openai.api-key=", "spring.ai.openai.chat.api-key=",
+				"metadata.ai.create-image-description=true" })
 class UploadFlowTests {
 
 	@TempDir
@@ -65,6 +66,13 @@ class UploadFlowTests {
 				HttpResponse.BodyHandlers.ofString());
 		assertThat(redirected.statusCode()).isEqualTo(200);
 		assertThat(redirected.body()).contains("You successfully uploaded upload-test.jpg!", "Inspect metadata");
+
+		HttpResponse<String> details = client.send(
+				HttpRequest.newBuilder(workspace.resolve("/image-details/upload-test.jpg")).GET().build(),
+				HttpResponse.BodyHandlers.ofString());
+		assertThat(details.statusCode()).isEqualTo(200);
+		assertThat(details.body()).contains("Image descriptions are disabled.", "Metadata", "upload-test.jpg")
+			.doesNotContain("description is temporarily unavailable");
 	}
 
 }

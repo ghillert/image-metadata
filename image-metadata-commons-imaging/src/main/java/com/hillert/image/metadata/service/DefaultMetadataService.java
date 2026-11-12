@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, 2025 Gunnar Hillert.
+ * Copyright (c) 2023, 2026 Gunnar Hillert.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.stream.StreamSource;
 
 import com.hillert.image.metadata.config.MetadataConfigProperties;
+import com.hillert.image.metadata.config.OpenAiConfigProperties;
 import com.hillert.image.metadata.model.DirectoryType;
 import com.hillert.image.metadata.model.GnssInfo;
 import com.hillert.image.metadata.model.Metadata;
@@ -67,6 +68,8 @@ import org.xml.sax.SAXException;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.content.Media;
+import org.springframework.ai.openai.OpenAiChatModel;
+import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.MimeType;
@@ -90,11 +93,28 @@ public class DefaultMetadataService implements MetadataService {
 	/**
 	 * Constructor.
 	 * @param metadataConfigProperties the {@link MetadataConfigProperties}
-	 * @param chatClientBuilder the ChatClient.Builder used to build the chatClient
+	 * @param openAiConfigProperties the optional OpenAI connection settings
 	 */
-	public DefaultMetadataService(MetadataConfigProperties metadataConfigProperties, ChatClient.Builder chatClientBuilder) {
+	public DefaultMetadataService(MetadataConfigProperties metadataConfigProperties,
+			OpenAiConfigProperties openAiConfigProperties) {
 		this.metadataConfigProperties = metadataConfigProperties;
-		this.chatClient = chatClientBuilder.build();
+		this.chatClient = createChatClient(metadataConfigProperties, openAiConfigProperties);
+	}
+
+	private static ChatClient createChatClient(MetadataConfigProperties metadata, OpenAiConfigProperties openAi) {
+		if (metadata.getAi() == null || !Boolean.TRUE.equals(metadata.getAi().getCreateImageDescription())
+				|| !StringUtils.hasText(openAi.effectiveApiKey())) {
+			LOGGER.info("AI image descriptions are disabled.");
+			return null;
+		}
+		OpenAiChatOptions.Builder options = OpenAiChatOptions.builder().apiKey(openAi.effectiveApiKey());
+		if (StringUtils.hasText(openAi.effectiveBaseUrl())) {
+			options.baseUrl(openAi.effectiveBaseUrl());
+		}
+		if (StringUtils.hasText(openAi.effectiveModel())) {
+			options.model(openAi.effectiveModel());
+		}
+		return ChatClient.builder(OpenAiChatModel.builder().options(options.build()).build()).build();
 	}
 
 	@Override
@@ -210,8 +230,8 @@ public class DefaultMetadataService implements MetadataService {
 	@Override
 	public String getImageDescription(Resource imageResource) {
 
-		if (!this.metadataConfigProperties.getAi().getCreateImageDescription()) {
-			return "Not activated.";
+		if (this.chatClient == null) {
+			return "Image descriptions are disabled.";
 		}
 
 		final String response;
