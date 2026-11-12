@@ -100,9 +100,9 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.hillert</groupId>
-			<artifactId>image-filters-4j</artifactId>
-			<version>${image-filters-4j.version}</version>
+			<groupId>com.pembana.imaging</groupId>
+			<artifactId>pembana-image-filters</artifactId>
+			<version>${pembana-image-filters.version}</version>
 		</dependency>
 	</dependencies>
 	<build>

@@ -90,7 +90,7 @@
 		<apache-commons-imaging.version>1.0.0-alpha6</apache-commons-imaging.version>
 		<apache-xmlgraphics-commons.version>2.12</apache-xmlgraphics-commons.version>
 		<assertj.version>3.27.7</assertj.version>
-		<image-filters-4j.version>1.0.0-SNAPSHOT</image-filters-4j.version>
+		<pembana-image-filters.version>1.0.0-M2</pembana-image-filters.version>
 		<imagej.version>1.54p</imagej.version>
 		<spring-ai.version>2.0.2</spring-ai.version>
 		<spring-boot.version>4.1.2</spring-boot.version>
