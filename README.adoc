@@ -337,7 +337,7 @@ java -Dspring.aot.enabled=true \
 -agentlib:native-image-agent=config-output-dir=image-metadata-commons-imaging/src/main/resources/META-INF/native-image \
 -jar image-metadata-commons-imaging/target/image-metadata-commons-imaging-{current-version}.jar
 ----
-\
+
 == License
 
 Image Metadata is licensed under the link:LICENSE[Apache License] (ASL), Version 2.0.
