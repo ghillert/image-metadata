@@ -26,7 +26,7 @@
 </main>
 <footer class="footer footer-transparent">
 <div class="container-xl d-flex flex-wrap justify-content-between gap-2">
-<span>Image Metadata</span>
+<span>Image Metadata · <a class="text-secondary" href="https://hillert.com">Hillert, Inc.</a></span>
 <span class="text-secondary">Crafted in Hawaiʻi by Gunnar Hillert</span>
 </div>
 </footer>
