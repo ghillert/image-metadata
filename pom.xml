@@ -93,7 +93,7 @@
 		<pembana-image-filters.version>1.0.0-M2</pembana-image-filters.version>
 		<imagej.version>1.54p</imagej.version>
 		<spring-ai.version>2.0.2</spring-ai.version>
-		<spring-boot.version>4.1.2</spring-boot.version>
+		<spring-boot.version>4.2.0</spring-boot.version>
 		<jte.version>3.2.5</jte.version>
 		<frontend-maven-plugin.version>2.0.2</frontend-maven-plugin.version>
 		<node.version>v24.21.0</node.version>
